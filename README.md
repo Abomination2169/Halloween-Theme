@@ -6,7 +6,10 @@ Watch Halloween Theme in action!
 
 ▶️ **Watch on YouTube:** https://www.youtube.com/watch?v=LgSdA3DGreM
 
-Happy Halloween! Transform your Beat Saber menu into a spooky graveyard with falling autumn leaves. Based on the fantastic Christmas Mod by vcmikuu laynia. Free music provided by the brilliant Alex Morgan. 
+Happy Halloween! 
+
+Transform your Beat Saber menu into a spooky graveyard with falling autumn leaves. 
+Based on the fantastic Christmas Mod by vcmikuu laynia. Free music provided by the brilliant Alex Morgan. 
 
 Note: Development assisted with use of A.I. Please support talented artists and coders whenever possible.
 

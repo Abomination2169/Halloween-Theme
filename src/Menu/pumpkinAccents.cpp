@@ -21,7 +21,7 @@ using namespace UnityEngine;
 
 // Keep the original namespace and entry points used by main.cpp.
 namespace Halloween::pumpkinAccents {
-    SafePtrUnity<GameObject> pumpkinAccents;
+    safe_ptr<GameObject*> pumpkinAccents;
 
     struct GraveSpot {
         Vector3 originalPosition;

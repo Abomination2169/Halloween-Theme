@@ -15,6 +15,4 @@ Note: Development assisted with use of A.I. Please support talented artists and 
 
 **Compatible with:** Beat Saber 1.40.8 (Quest)
 
-## Building from source
-
 The supported Quest baseline is Beat Saber **1.40.8**.

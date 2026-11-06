@@ -14,5 +14,3 @@ Based on the fantastic Christmas Mod by vcmikuu laynia. Free music provided by t
 Note: Development assisted with use of A.I. Please support talented artists and coders whenever possible.
 
 **Compatible with:** Beat Saber 1.40.8 (Quest)
-
-The supported Quest baseline is Beat Saber **1.40.8**.

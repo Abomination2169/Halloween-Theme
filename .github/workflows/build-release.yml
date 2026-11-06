@@ -105,7 +105,7 @@ jobs:
               manifest = json.loads(archive.read("mod.json"))
               if manifest.get("id") != "halloween":
                   raise SystemExit("Unexpected packaged mod id")
-              if manifest.get("packageVersion") != "1.40.8_7379":
+              if manifest.get("packageVersion") != "1.45.3_30054":
                   raise SystemExit("Packaged manifest no longer targets Beat Saber 1.45.3_30054")
               if "libhalloween.so" not in names:
                   raise SystemExit("QMOD is missing libhalloween.so")

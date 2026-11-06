@@ -15,18 +15,22 @@ Note: Development assisted with use of A.I. Please support talented artists and 
 
 **Compatible with:** Beat Saber 1.40.8 (Quest)
 
-## Building from source
+## 🎃 Halloween Theme — Beat Saber 1.45.3 development port
 
-The supported Quest baseline is Beat Saber **1.40.8**.
+This branch is the separate Beat Saber **1.45.3** development port. The stable `main` branch and v1.0.0 release remain on Beat Saber 1.40.8.
+
+The port preserves the existing Halloween environment, autumn leaves, pumpkin artwork, and Ghostly Horror menu music. It updates QPM dependencies, Android NDK, and the QMOD target to the 1.45.3 Quest build (`1.45.3_30054`).
+
+**Status:** Development build only. CI compilation and package validation are not a substitute for headset testing. Do not install this build over your stable 1.40.8 setup.
+
+## Building
 
 Requirements:
-- QPM CLI (GitHub Actions pins QPM v1.5.12)
-- Android NDK 27.3.13750724
-- CMake 3.22 or newer
+- QPM CLI
+- Android NDK 29.0.14206865
+- CMake 3.22+
 - Ninja
 - Python 3
-
-From the repository root:
 
 ```sh
 qpm ndk resolve -d
@@ -37,4 +41,4 @@ cmake --build build --parallel
 qpm qmod zip --import mod.json --skip_build
 ```
 
-The generated package is `Halloween.qmod`. GitHub Actions builds and validates the QMOD on pushes and pull requests. A new version tag (for example, `v1.0.1`) publishes the QMOD and a source ZIP. Update the QPM and mod template versions before tagging a release.
+The generated package targets Beat Saber `1.45.3_30054`. The stable 1.40.8 release is unchanged.

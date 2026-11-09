@@ -39,3 +39,10 @@ Sources:
 - No ARM64 compile or runtime verification has been completed for 1.45.3.
 
 The staged metadata and CI target changes do not modify the Halloween runtime source. The port is not yet a validated QMOD.
+
+## First CI findings (2026-11-09)
+
+- GitHub Actions run [42631061051](https://github.com/Abomination2169/Halloween-Theme/actions/runs/42631061051) passed source audit, tool installation and NDK resolution, then **failed QPM restore**.
+- Resolver explicitly reported that `config-utils` 2.0.3 requires beatsaber-hook 6.x and 2.0.4 requires 7.x; neither is compatible with the port's beatsaber-hook 9.3.0.
+- For the next CI experiment, the port branch removes `config-utils` and replaces its config macros with a **temporary defaults-only shim** in `include/c.hpp`. All four features remain enabled. This shim **does not load/save persistent settings**, so it is not a release-ready settings migration.
+- CI must establish the next dependency or C++ compile blocker. Do not interpret this change as a successful 1.45.3 port.

@@ -105,3 +105,9 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - The port branch's GitHub Actions `release` job is explicitly disabled (`if: false`) until Quest 3 smoke tests, dependency manifest verification, settings persistence and the upstream header compatibility patch are resolved. This does **not** change production `main` or existing releases.
 - A new CI check inspects the built ARM64 ELF and requires a `libflamingo.so` DT_NEEDED entry. CI result pending at time of change.
 - The QMOD manifest currently has an empty `dependencies` array in `mod.template.json`; review whether the generated package declares all required runtime mods before any install or release.
+
+## QMOD runtime dependency audit
+
+- CI now prints and validates generated `mod.json` dependency IDs after `qpm qmod manifest`. Required IDs: `beatsaber-hook`, `bsml`, `custom-types`, `paper2_scotland2`, `flamingo`.
+- This check deliberately runs **after** QPM manifest generation and fails closed if required dependencies are absent. It does not assume that linking the `.so` automatically populates the QMOD dependency manifest.
+- Confirm the next CI result before treating the package as installable. Do not merge or release the draft port.

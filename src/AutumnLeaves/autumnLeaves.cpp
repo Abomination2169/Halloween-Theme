@@ -68,35 +68,30 @@ namespace Halloween::autumnLeaves {
         autumnLeavesGo->transform->position = UnityEngine::Vector3(0.0f, 7.0f, 0.0f);
         autumnLeavesGo->transform->rotation = UnityEngine::Quaternion::Euler(UnityEngine::Vector3(0.0f, 0.0f, 0.0f));
 
-        // 1.45.3 headset log confirms the legacy _Injected lookups all failed.
-        // Use the generated Unity bindings rather than obsolete manually-resolved
-        // ParticleSystem module internal calls. These are versioned with the game.
-        auto mainModule = autumnLeaves->main;
-        mainModule.set_startLifetime(UnityEngine::ParticleSystem::MinMaxCurve(14.0f));
-        mainModule.set_startSize(UnityEngine::ParticleSystem::MinMaxCurve(0.18f));
-        mainModule.set_maxParticles(150);
-        mainModule.set_gravityModifier(UnityEngine::ParticleSystem::MinMaxCurve(0.025f));
-        mainModule.set_startColor(UnityEngine::ParticleSystem::MinMaxGradient(UnityEngine::Color(1, 1, 1, 1)));
+        // Only use methods present in Beat Saber 1.45.3's generated
+        // IL2CPP bindings. The older manually-resolved _Injected symbols
+        // are not available in this version.
+        UnityEngine::ParticleSystem::MinMaxCurve lifetime{};
+        lifetime._ctor(14.0f);
+        UnityEngine::ParticleSystem::MinMaxCurve emissionRate{};
+        emissionRate._ctor(5.0f);
+        UnityEngine::ParticleSystem::MinMaxGradient white{};
+        white._ctor(UnityEngine::Color(1, 1, 1, 1));
 
-        auto colorOverLifetime = autumnLeaves->colorOverLifetime;
-        colorOverLifetime.set_enabled(false);
-        auto colorBySpeed = autumnLeaves->colorBySpeed;
-        colorBySpeed.set_enabled(false);
+        auto mainModule = autumnLeaves->main;
+        mainModule.set_startLifetime(lifetime);
+        mainModule.set_startSizeMultiplier(0.18f);
+        mainModule.set_maxParticles(150);
+        mainModule.set_gravityModifierMultiplier(0.025f);
+        mainModule.set_startColor(white);
+
         auto emission = autumnLeaves->emission;
         emission.set_enabled(true);
-        emission.set_rateOverTime(UnityEngine::ParticleSystem::MinMaxCurve(5.0f));
+        emission.set_rateOverTime(emissionRate);
         auto shape = autumnLeaves->shape;
-        shape.set_shapeType(UnityEngine::ParticleSystemShapeType::Box);
-        shape.set_position(UnityEngine::Vector3(0, 0, 0));
         shape.set_rotation(UnityEngine::Vector3(0, 0, 0));
-        shape.set_scale(UnityEngine::Vector3(20, 1, 20));
-        auto collision = autumnLeaves->collision;
-        collision.set_enabled(true);
-        collision.set_type(UnityEngine::ParticleSystemCollisionType::World);
-        collision.set_collidesWith(UnityEngine::LayerMask(0xffffffff));
-        collision.set_dampen(UnityEngine::ParticleSystem::MinMaxCurve(0.08f));
-        collision.set_bounce(UnityEngine::ParticleSystem::MinMaxCurve(0.0f));
-        collision.set_lifetimeLoss(UnityEngine::ParticleSystem::MinMaxCurve(0.02f));
+        // Other shape, collision and texture-sheet animation setters were
+        // stripped from the generated game bindings; do not call them.
         const int numLeafSprites = 5;
         auto leafTexture = BSML::Utilities::LoadTextureRaw(static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaves_png));
         auto leafMaterial = particleRenderer->get_material();
@@ -122,14 +117,8 @@ if (leafShader && particleRenderer) {
 } else {
     WARNING("Autumn leaves: Sprites/Default shader not found; using original material");
 }
-        auto textureSheet = autumnLeaves->textureSheetAnimation;
-        textureSheet.set_enabled(true);
-        textureSheet.set_mode(UnityEngine::ParticleSystemAnimationMode::Grid);
-        textureSheet.set_numTilesX(numLeafSprites);
-        textureSheet.set_numTilesY(1);
-        textureSheet.set_frameOverTime(UnityEngine::ParticleSystem::MinMaxCurve(0.0f, numLeafSprites));
-        textureSheet.set_startFrame(UnityEngine::ParticleSystem::MinMaxCurve(0.0f, numLeafSprites));
-        textureSheet.set_cycleCount(0);
+        // TextureSheetAnimationModule has no generated setters in 1.45.3.
+        // Keep the inherited emitter properties while using our leaf texture.
 
         // Keep the template dust active until the leaves have been configured.
         // Only replace the original menu effect after the clone is ready.

@@ -76,3 +76,11 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - The earliest persistent failure comes from beatsaber-hook's `shared/find.hpp`: a `constexpr find_method_info` constructor takes non-literal `i2c::view` parameters; this causes cascaded generated `bs-cordl` constructor errors. The same declaration appears in upstream beatsaber-hook `v9.4.3` and `master` as checked on 2026-11-09.
 - A strictly guarded, **CI-only diagnostic** in `scripts/diagnose-hook-constexpr.py` removes `constexpr` from exactly this one dependency declaration after QPM restore. It refuses to run if the upstream declaration differs. This is not a runtime fix or an upstream source change; assess its compiler result and replace it with an upstream-supported solution before release.
 - Do not deploy any build until all APIs, packages and game behavior pass validation.
+
+
+## Run 42633254429 — compiler migration
+
+- The guarded, CI-only beatsaber-hook `find_method_info` diagnostic passed, allowing compilation to reach Halloween source files. This is **not** a supported upstream fix and must be replaced or justified before release.
+- Compilation then failed on legacy `il2cpp_utils::resolve_icall`, `Array::get_Length()`, `SafePtrUnity`, and `il2cpp_functions::Init()` APIs.
+- First-pass branch-only replacements use `i2c::resolve_icall(...).value()`, `Array::max_length`, `safe_ptr<UnityEngine::GameObject*>`, and `i2c::functions::initialize()`. These changes are **compiler candidates**, not gameplay-tested modifications.
+- Review `safe_ptr` lifecycle, Unity object destruction and particle-system icall signatures before any Quest installation. CI must prove the build first.

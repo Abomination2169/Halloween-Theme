@@ -37,3 +37,19 @@ for filename, needles in (
     for line in p.read_text(encoding="utf-8").splitlines():
         if line.strip().startswith(("inline", "static inline")) and any(x in line for x in needles):
             print(line.strip()[:300])
+
+print("--- ParticleSystem particle array / simulation methods ---")
+for filename in ("UnityEngine/zzzz__ParticleSystem_def.hpp",
+                 "UnityEngine/zzzz__ParticleSystem_Particle_def.hpp",
+                 "UnityEngine/zzzz__ParticleSystem_EmissionModule_def.hpp"):
+    p = Path("extern/includes/bs-cordl/include") / filename
+    if not p.exists():
+        print("MISSING", p)
+        continue
+    for line in p.read_text(encoding="utf-8").splitlines():
+        if any(x in line for x in ("GetParticles", "SetParticles", "GetCustomParticleData",
+                                 "SetCustomParticleData", "Simulate(", "get_position(",
+                                 "set_position(", "get_remainingLifetime(", "set_remainingLifetime(",
+                                 "get_startLifetime(", "get_velocity(", "set_velocity(",
+                                 "GetBursts", "SetBursts", "burstCount", "Clear(", "Stop(")):
+            print(line.strip()[:300])

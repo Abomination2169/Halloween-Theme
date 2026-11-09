@@ -149,6 +149,15 @@ jobs:
                   raise SystemExit("Unexpected packaged mod id")
               if manifest.get("packageVersion") != "1.45.3_30054":
                   raise SystemExit("Packaged manifest no longer targets Beat Saber 1.45.3_30054")
+              required = {"beatsaber-hook", "bsml", "custom-types", "paper2_scotland2", "flamingo"}
+              deps = manifest.get("dependencies", [])
+              declared = {d.get("id") for d in deps if isinstance(d, dict)}
+              if required - declared:
+                  raise SystemExit(f"Packaged QMOD missing dependencies: {sorted(required - declared)}")
+              for dep in deps:
+                  if isinstance(dep, dict) and dep.get("id") in required:
+                      if not dep.get("downloadIfMissing", "").startswith("https://"):
+                          raise SystemExit(f"Missing HTTPS dependency download for {dep['id']}")
               if "libhalloween.so" not in names:
                   raise SystemExit("QMOD is missing libhalloween.so")
               cover = manifest.get("coverImage")

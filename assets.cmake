@@ -15,7 +15,7 @@ set(ASSET_HEADER_DATA
 
 #include <string_view>
 
-#include \"beatsaber-hook/shared/utils/typedefs.h\"
+#include \"beatsaber-hook/shared/arrayw.hpp\"
 
 struct IncludedAsset {
 
@@ -38,7 +38,7 @@ struct IncludedAsset {
 
     void init() const {
         if (!array->klass)
-            array->klass = classof(Array<uint8_t>*);
+            array->klass = i2c::class_of<Array<uint8_t>*>();
     }
 
    private:

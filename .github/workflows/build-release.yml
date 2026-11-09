@@ -68,6 +68,21 @@ jobs:
               raise SystemExit("Manifest no longer targets Beat Saber 1.45.3_30054")
           if manifest.get("modFiles") != ["libhalloween.so"]:
               raise SystemExit("Unexpected Halloween library declaration")
+          # Runtime dependencies must be present in the generated QMOD manifest,
+          # not merely linked into the ELF by CMake.
+          dependencies = manifest.get("dependencies", [])
+          print("Generated QMOD runtime dependencies:", json.dumps(dependencies, sort_keys=True))
+          if not isinstance(dependencies, list):
+              raise SystemExit("QMOD dependencies is not a list")
+          required = {"beatsaber-hook", "bsml", "custom-types", "paper2_scotland2", "flamingo"}
+          declared = {
+              dep.get("id")
+              for dep in dependencies
+              if isinstance(dep, dict) and isinstance(dep.get("id"), str)
+          }
+          missing = required - declared
+          if missing:
+              raise SystemExit(f"Generated QMOD missing runtime dependency IDs: {sorted(missing)}")
           if not Path(manifest["coverImage"]).is_file():
               raise SystemExit("Cover image is missing")
           for entry in manifest.get("fileCopies", []):

@@ -10,6 +10,8 @@
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/ParticleSystem.hpp"
 #include "UnityEngine/ParticleSystemSimulationSpace.hpp"
+#include "UnityEngine/ParticleSystemCollisionType.hpp"
+#include "UnityEngine/LayerMask.hpp"
 #include "UnityEngine/ParticleSystemRenderer.hpp"
 #include "UnityEngine/Material.hpp"
 #include "UnityEngine/Shader.hpp"
@@ -129,7 +131,7 @@ namespace Halloween::autumnLeaves {
                 ParticleSystem::MinMaxCurve emissionRate{};
                 emissionRate._ctor(1.0f); // 5 emitters x 1 = original 5 particles/sec
                 ParticleSystem::MinMaxGradient white{};
-                white._ctor(Color(1, 1, 1, 1));
+                white._ctor(Color(1, 1, 1, 0.75f));
 
                 auto mainModule = system->main;
                 mainModule.set_startLifetime(lifetime);
@@ -138,6 +140,21 @@ namespace Halloween::autumnLeaves {
                 mainModule.set_gravityModifierMultiplier(0.025f);
                 mainModule.set_startColor(white);
                 mainModule.set_simulationSpace(ParticleSystemSimulationSpace::World);
+
+                // Restore the original 1.40.8 world-collision settings.
+                auto collision = system->collision;
+                collision.set_enabled(true);
+                collision.set_type(ParticleSystemCollisionType::World);
+                collision.set_collidesWith(LayerMask(-1));
+                ParticleSystem::MinMaxCurve dampen{};
+                dampen._ctor(0.08f);
+                ParticleSystem::MinMaxCurve bounce{};
+                bounce._ctor(0.0f);
+                ParticleSystem::MinMaxCurve lifetimeLoss{};
+                lifetimeLoss._ctor(0.02f);
+                collision.set_dampen(dampen);
+                collision.set_bounce(bounce);
+                collision.set_lifetimeLoss(lifetimeLoss);
 
                 // A cloned DustPS may contain already-simulated particles.
                 // Reset it so five clones do not multiply the initial burst.
@@ -179,7 +196,7 @@ namespace Halloween::autumnLeaves {
         // The original 1.40.8 emitter produces five leaves per second.
         // One shared clock and round-robin selection reproduce that timing
         // without allowing five cloned DustPS burst schedules to stack.
-        emissionAccumulator += Time::get_deltaTime() * 5.0f;
+        emissionAccumulator += Time::get_deltaTime() * 3.0f;
         int emittedThisFrame = 0;
         while (emissionAccumulator >= 1.0f && emittedThisFrame < 3) {
             auto& leaf = leafObjects[nextLeafVariant];
@@ -199,34 +216,8 @@ namespace Halloween::autumnLeaves {
         // Prevent a paused menu from accumulating an emission backlog.
         if (emissionAccumulator > 3.0f) emissionAccumulator = 0.0f;
 
-        // Cut off below-floor particles on every frame rather than every third
-        // frame. This remains a cutoff, not Unity world collision.
-        constexpr float FloorY = 0.5f; // experimental visual cutoff, not physical collision
-        constexpr int MaxPerEmitter = 30;
-        for (auto& leaf : leafObjects) {
-            if (!leaf) continue;
-            auto system = leaf->GetComponent<ParticleSystem*>();
-            if (!system) continue;
-            ArrayW<ParticleSystem_Particle> particles(MaxPerEmitter);
-            if (!particles) continue;
-            int count = system->GetParticles(particles);
-            bool changed = false;
-            for (int j = 0; j < count; ++j) {
-                // DustPS may inherit particle alpha fading despite white start color.
-                // Keep the original leaf artwork alpha, but prevent inherited
-                // per-particle tint from making the whole leaf translucent.
-                if (particles[j].m_StartColor.a != 255) {
-                    particles[j].m_StartColor.a = 255;
-                    changed = true;
-                }
-                if (particles[j].m_Position.y < FloorY) {
-                    particles[j].set_remainingLifetime(0.0f);
-                    ++diagnosticsFloorRemoved;
-                    changed = true;
-                }
-            }
-            if (changed) system->SetParticles(particles, count);
-        }
+        // World collision handles floor contact; do not delete particles midair.
+        // Keep the proven direct Emit(1) path unchanged.
         // Quest diagnostics: sample observed particles rather than assuming
         // five cloned DustPS emitters follow the 1.40.8 behavior.
         diagnosticsElapsed += Time::get_deltaTime();
@@ -237,7 +228,7 @@ namespace Halloween::autumnLeaves {
                 auto ps = leaf->GetComponent<ParticleSystem*>();
                 if (ps) alive += ps->get_particleCount();
             }
-            INFO("AutumnLeaves1453 DIAG seconds={} emitted={} alive={} removedBelowY0={}",
+            INFO("AutumnLeaves1453 DIAG seconds={} emitted={} alive={} removedByCutoff={}",
                  diagnosticsElapsed, diagnosticsEmitted, alive, diagnosticsFloorRemoved);
             diagnosticsElapsed = 0.0f;
             diagnosticsEmitted = 0;

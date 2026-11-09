@@ -9,7 +9,6 @@
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/ParticleSystem.hpp"
-#include "UnityEngine/Vector3.hpp"
 #include "UnityEngine/ParticleSystemSimulationSpace.hpp"
 #include "UnityEngine/ParticleSystemRenderer.hpp"
 #include "UnityEngine/Material.hpp"
@@ -33,11 +32,6 @@ namespace Halloween::autumnLeaves {
         float diagnosticsElapsed = 0.0f;
         int diagnosticsEmitted = 0;
         int diagnosticsFloorRemoved = 0;
-        uint32_t randomState = 0x41C64E6Du;
-        float RandomUnit() {
-            randomState = randomState * 1664525u + 1013904223u;
-            return static_cast<float>((randomState >> 8) & 0x00ffffffu) / 16777216.0f;
-        }
 
         void RemoveLeafClones() {
             for (auto& leaf : leafObjects) {
@@ -56,7 +50,6 @@ namespace Halloween::autumnLeaves {
         diagnosticsElapsed = 0.0f;
         diagnosticsEmitted = 0;
         diagnosticsFloorRemoved = 0;
-        randomState = 0x41C64E6Du;
 
         // Find the original menu dust emitter, which supplies working motion
         // and geometry on Beat Saber 1.45.3.
@@ -193,16 +186,7 @@ namespace Halloween::autumnLeaves {
             if (leaf) {
                 auto system = leaf->GetComponent<ParticleSystem*>();
                 if (system) {
-                    // The original 1.40.8 emitter uses a 20 x 1 x 20 box
-                    // centered at (0, 7, 0). EmitParams positions are relative
-                    // to the emitter transform at Y=7, not absolute world Y.
-                    // Passing Y=7 here placed leaves another seven units up.
-                    ParticleSystem_EmitParams params{};
-                    params.set_applyShapeToPosition(false);
-                    params.set_position(Vector3((RandomUnit() - 0.5f) * 20.0f,
-                                                (RandomUnit() - 0.5f),
-                                                (RandomUnit() - 0.5f) * 20.0f));
-                    system->Emit(params, 1);
+                    // Restore the last Quest-visible emission path. Explicit\n                    // EmitParams positions made all leaves invisible on device.\n                    system->Emit(1);
                 }
             }
             nextLeafVariant = (nextLeafVariant + 1) % LeafVariants;

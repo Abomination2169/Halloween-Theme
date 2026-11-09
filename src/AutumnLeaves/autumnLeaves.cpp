@@ -1,4 +1,5 @@
 #include "AutumnLeaves/autumnLeaves.hpp"
+#include "AutumnLeaves/particleController.hpp"
 #include "main.hpp"
 #include "beatsaber-hook/shared/safeptr.hpp"
 #include "assets.hpp"
@@ -10,7 +11,6 @@
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/ParticleSystem.hpp"
 #include "UnityEngine/ParticleSystemSimulationSpace.hpp"
-#include "UnityEngine/ParticleSystemCollisionType.hpp"
 #include "UnityEngine/LayerMask.hpp"
 #include "UnityEngine/ParticleSystemRenderer.hpp"
 #include "UnityEngine/Material.hpp"
@@ -142,19 +142,20 @@ namespace Halloween::autumnLeaves {
                 mainModule.set_simulationSpace(ParticleSystemSimulationSpace::World);
 
                 // Restore the original 1.40.8 world-collision settings.
-                auto collision = system->collision;
-                collision.set_enabled(true);
-                collision.set_type(ParticleSystemCollisionType::World);
-                collision.set_collidesWith(LayerMask(-1));
-                ParticleSystem::MinMaxCurve dampen{};
-                dampen._ctor(0.08f);
-                ParticleSystem::MinMaxCurve bounce{};
-                bounce._ctor(0.0f);
-                ParticleSystem::MinMaxCurve lifetimeLoss{};
-                lifetimeLoss._ctor(0.02f);
-                collision.set_dampen(dampen);
-                collision.set_bounce(bounce);
-                collision.set_lifetimeLoss(lifetimeLoss);
+                // Generated 1.45.3 CollisionModule exposes no public setters.
+                // Use the existing guarded Unity particle ICALL compatibility layer.
+                Flair::ParticleController::CollisionModule::set_enabled(system, true);
+                Flair::ParticleController::CollisionModule::set_type(
+                    system, Flair::ParticleController::CollisionType::World);
+                LayerMask allLayers{};
+                allLayers.m_Mask = -1;
+                Flair::ParticleController::CollisionModule::set_collidesWith(system, allLayers);
+                Flair::ParticleController::CollisionModule::set_dampen(
+                    system, Flair::ParticleController::MinMaxCurve(0.08f));
+                Flair::ParticleController::CollisionModule::set_bounce(
+                    system, Flair::ParticleController::MinMaxCurve(0.0f));
+                Flair::ParticleController::CollisionModule::set_lifetimeLoss(
+                    system, Flair::ParticleController::MinMaxCurve(0.02f));
 
                 // A cloned DustPS may contain already-simulated particles.
                 // Reset it so five clones do not multiply the initial burst.

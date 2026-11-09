@@ -99,3 +99,9 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - Artifact: [Halloween-1453-QMOD](https://github.com/Abomination2169/Halloween-Theme/actions/runs/42634367459/artifacts/13680994498), ~5.6 MB as uploaded ZIP; contains `Halloween-Theme.qmod`.
 - Linker fix: adding explicit `flamingo ^1.3.1` QPM dependency resolved `flamingo::Install(flamingo::HookInfo&&)`.
 - **NOT release-ready**: no Quest headset runtime test; temporary header diagnostic edits downloaded dependency headers in CI; port config shim does not persist settings; need inspect runtime hook ABI and particle ICALL safety/appearance. Keep draft PR unmerged and preserve production `main` plus v1.0.0 release.
+
+## Release safety gate (2026-11-09)
+
+- The port branch's GitHub Actions `release` job is explicitly disabled (`if: false`) until Quest 3 smoke tests, dependency manifest verification, settings persistence and the upstream header compatibility patch are resolved. This does **not** change production `main` or existing releases.
+- A new CI check inspects the built ARM64 ELF and requires a `libflamingo.so` DT_NEEDED entry. CI result pending at time of change.
+- The QMOD manifest currently has an empty `dependencies` array in `mod.template.json`; review whether the generated package declares all required runtime mods before any install or release.

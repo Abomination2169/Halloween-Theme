@@ -1,11 +1,26 @@
 #pragma once
-#include "config-utils/shared/config-utils.hpp"
 
-DECLARE_CONFIG(ModConfig) {
-    CONFIG_VALUE(EnableMenuMusic, bool, "Enable Menu Music", true);
-    CONFIG_VALUE(EnableAutumnLeaves, bool, "Enable Falling Autumn Leaves", true);
-    CONFIG_VALUE(EnableHauntedEnvColors, bool, "Enable Haunted Environment Colors", true);
-    CONFIG_VALUE(EnablePumpkinAccents, bool, "Enable Pumpkin Accent Mounds", true);
-    // CONFIG_VALUE(EnableBlocks, bool, "Enable Halloween blocks", true);
-
+// 1.45.3 port-only compatibility defaults.
+// Legacy config-utils 2.x requires beatsaber-hook <8 and cannot resolve
+// alongside beatsaber-hook 9.3.0. This temporary shim preserves the
+// four enabled-by-default behaviors but DOES NOT persist user settings.
+// Replace with a compatible settings implementation before release.
+struct HalloweenPortFlag {
+    bool value = true;
+    bool GetValue() const { return value; }
 };
+
+struct ModConfig {
+    HalloweenPortFlag EnableMenuMusic{};
+    HalloweenPortFlag EnableAutumnLeaves{};
+    HalloweenPortFlag EnableHauntedEnvColors{};
+    HalloweenPortFlag EnablePumpkinAccents{};
+
+    template <typename T>
+    void Init(const T&) {}
+};
+
+inline ModConfig& getModConfig() {
+    static ModConfig config{};
+    return config;
+}

@@ -60,3 +60,10 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - `include/main.hpp` referenced removed legacy `beatsaber-hook/shared/utils/hooking.hpp`. Port branch now uses `beatsaber-hook/shared/hooking.hpp` and removes legacy il2cpp-functions/logging includes; **this change is unverified**.
 - A separate generated-header incompatibility remains: `beatsaber-hook/shared/find.hpp` `find_method_info` constexpr construction and numerous `bs-cordl` generated `zzzz__*_impl.hpp` constructors. Investigate the exact C++ toolchain/header API combination before attempting any broad replacements.
 - Next errors may expose obsolete `MAKE_HOOK_MATCH`, `INSTALL_HOOK`, `il2cpp_functions::Init` and generated Beat Saber API signatures. No runtime testing until a clean compile and QMOD archive validation.
+
+## Run 42632239406 (2026-11-09)
+
+- Dependency restoration and Android configuration succeeded, but C++ compilation failed.
+- Current primary upstream header problem: beatsaber-hook 9.4.3 `shared/find.hpp:73` declares a `constexpr` constructor accepting `i2c::view`, whose constructors in `shared/utils.hpp` are not `constexpr`. Clang rejects this, causing cascaded generated `bs-cordl` errors. This must be resolved against upstream compatibility, **not** by bulk-editing generated headers.
+- A separate local issue is the asset generator's obsolete `beatsaber-hook/shared/utils/typedefs.h` include; the port's `assets.cmake` was updated to use `shared/arrayw.hpp` and `i2c::class_of`. This change is pending CI verification.
+- The port still needs updated hooks and a settings implementation; no 1.45.3 QMOD is validated.

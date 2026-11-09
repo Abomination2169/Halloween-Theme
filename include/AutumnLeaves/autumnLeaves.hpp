@@ -4,5 +4,6 @@ namespace Halloween::autumnLeaves {
 
     void CreateAutumnLeaves();
     void DestroyAutumnLeaves();
+    void UpdateLeafFloor();
 
 }

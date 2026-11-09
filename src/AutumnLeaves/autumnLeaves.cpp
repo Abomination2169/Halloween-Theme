@@ -33,7 +33,7 @@ namespace Halloween::autumnLeaves {
         int nextLeafVariant = 0;
         float diagnosticsElapsed = 0.0f;
         int diagnosticsEmitted = 0;
-        int diagnosticsFloorRemoved = 0;
+
 
         void RemoveLeafClones() {
             for (auto& leaf : leafObjects) {
@@ -51,7 +51,6 @@ namespace Halloween::autumnLeaves {
         nextLeafVariant = 0;
         diagnosticsElapsed = 0.0f;
         diagnosticsEmitted = 0;
-        diagnosticsFloorRemoved = 0;
 
         // Find the original menu dust emitter, which supplies working motion
         // and geometry on Beat Saber 1.45.3.
@@ -131,15 +130,29 @@ namespace Halloween::autumnLeaves {
                 ParticleSystem::MinMaxCurve emissionRate{};
                 emissionRate._ctor(1.0f); // 5 emitters x 1 = original 5 particles/sec
                 ParticleSystem::MinMaxGradient white{};
-                white._ctor(Color(1, 1, 1, 0.75f));
+                white._ctor(Color(1, 1, 1, 1.0f));
 
                 auto mainModule = system->main;
                 mainModule.set_startLifetime(lifetime);
                 mainModule.set_startSizeMultiplier(0.18f);
-                mainModule.set_maxParticles(30);
+                mainModule.set_maxParticles(150);
                 mainModule.set_gravityModifierMultiplier(0.025f);
                 mainModule.set_startColor(white);
                 mainModule.set_simulationSpace(ParticleSystemSimulationSpace::World);
+
+                // Mirror the original 1.40.8 particle configuration rather
+                // than inheriting DustPS color fades or speed-driven tint.
+                Flair::ParticleController::ColorOverLifetimeModule::set_enabled(system, false);
+                Flair::ParticleController::ColorBySpeedModule::set_enabled(system, false);
+                Flair::ParticleController::ShapeModule::set_enabled(system, true);
+                Flair::ParticleController::ShapeModule::set_shapeType(
+                    system, Flair::ParticleController::ShapeType::Box);
+                Flair::ParticleController::ShapeModule::set_position(
+                    system, Vector3(0.0f, 0.0f, 0.0f));
+                Flair::ParticleController::ShapeModule::set_rotation(
+                    system, Vector3(0.0f, 0.0f, 0.0f));
+                Flair::ParticleController::ShapeModule::set_scale(
+                    system, Vector3(20.0f, 1.0f, 20.0f));
 
                 // Restore the original 1.40.8 world-collision settings.
                 // Generated 1.45.3 CollisionModule exposes no public setters.
@@ -169,8 +182,7 @@ namespace Halloween::autumnLeaves {
                 // cadence rather than multiplying inherited dust emissions.
                 emission.set_rateOverTime(emissionRate);
                 emission.set_enabled(false);
-                auto shape = system->shape;
-                shape.set_rotation(Vector3(0, 0, 0));
+
             }
         } catch (...) {
             WARNING("Autumn leaves: exception while cropping atlas or creating emitters");
@@ -197,7 +209,7 @@ namespace Halloween::autumnLeaves {
         // The original 1.40.8 emitter produces five leaves per second.
         // One shared clock and round-robin selection reproduce that timing
         // without allowing five cloned DustPS burst schedules to stack.
-        emissionAccumulator += Time::get_deltaTime() * 3.0f;
+        emissionAccumulator += Time::get_deltaTime() * 5.0f;
         int emittedThisFrame = 0;
         while (emissionAccumulator >= 1.0f && emittedThisFrame < 3) {
             auto& leaf = leafObjects[nextLeafVariant];
@@ -230,7 +242,7 @@ namespace Halloween::autumnLeaves {
                 if (ps) alive += ps->get_particleCount();
             }
             INFO("AutumnLeaves1453 DIAG seconds={} emitted={} alive={} removedByCutoff={}",
-                 diagnosticsElapsed, diagnosticsEmitted, alive, diagnosticsFloorRemoved);
+                 diagnosticsElapsed, diagnosticsEmitted, alive, 0);
             diagnosticsElapsed = 0.0f;
             diagnosticsEmitted = 0;
             diagnosticsFloorRemoved = 0;

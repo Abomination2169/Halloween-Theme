@@ -53,3 +53,10 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - Compilation stopped on the removed `beatsaber-hook/shared/config/config-utils.hpp` header and C++20 not supporting `std::expected` used by beatsaber-hook 9.x.
 - Port branch removes the obsolete include from `include/main.hpp` and sets CMake C++ standard to 23. This addresses only the observed first-layer toolchain errors; generated API migration remains outstanding.
 - No successful port QMOD or Quest runtime validation yet.
+
+## Next compile run (42631735184)
+
+- QPM restored `bs-cordl` 4503.0.0 and `beatsaber-hook` 9.4.3; compile still failed.
+- `include/main.hpp` referenced removed legacy `beatsaber-hook/shared/utils/hooking.hpp`. Port branch now uses `beatsaber-hook/shared/hooking.hpp` and removes legacy il2cpp-functions/logging includes; **this change is unverified**.
+- A separate generated-header incompatibility remains: `beatsaber-hook/shared/find.hpp` `find_method_info` constexpr construction and numerous `bs-cordl` generated `zzzz__*_impl.hpp` constructors. Investigate the exact C++ toolchain/header API combination before attempting any broad replacements.
+- Next errors may expose obsolete `MAKE_HOOK_MATCH`, `INSTALL_HOOK`, `il2cpp_functions::Init` and generated Beat Saber API signatures. No runtime testing until a clean compile and QMOD archive validation.

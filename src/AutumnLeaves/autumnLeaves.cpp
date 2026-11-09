@@ -147,7 +147,11 @@ namespace Halloween::autumnLeaves {
         // Start all five clean emitters together, after the old dust is hidden.
         dustGo->active = false;
         for (auto& leaf : leafObjects) {
-            if (leaf) leaf->active = true;
+            if (leaf) {
+                leaf->active = true;
+                auto system = leaf->GetComponent<ParticleSystem*>();
+                if (system) system->Play();
+            }
         }
         INFO("Autumn leaves: five individual leaf textures active; original menu dust disabled");
     }

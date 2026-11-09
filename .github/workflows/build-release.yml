@@ -25,6 +25,9 @@ jobs:
       - name: Audit source configuration and package metadata
         run: python3 scripts/audit-source.py
 
+      - name: Check pre-install runtime safety contracts
+        run: python3 tests/runtime-contracts.py
+
       - name: Test persistent settings on Linux host
         run: |
           mkdir -p "$RUNNER_TEMP/halloween-settings-test"

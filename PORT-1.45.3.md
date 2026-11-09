@@ -142,3 +142,9 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - The particle clone no longer disables the original Beat Saber `DustPS` object. Previously, missing particle components or texture setup could leave the original dust disabled, and cleanup would reactivate an object the mod did not own. This avoids changing the base environment state at the cost of displaying original dust alongside leaves.
 - Added checks for the cloned `ParticleSystem`, `ParticleSystemRenderer`, texture, and material before use; a failed clone is destroyed rather than dereferenced.
 - These changes need CI compilation and Quest runtime testing. The many legacy `resolve_icall(...).value()` calls remain a **separate** potential runtime-failure risk and have not yet been resolved.
+
+## Menu dust replacement decision (2026-11-09)
+
+- Owner preference: the Halloween leaves should **replace** the default menu dust, not render alongside it.
+- After a successful leaf clone and particle configuration, deactivate original `DustPS`; on failed clone setup, leave `DustPS` untouched. `DestroyAutumnLeaves()` removes the custom object and restores `DustPS` to active. This is scoped to the 1.45.3 development branch.
+- GitHub Actions validates compilation, not Unity runtime behavior. Confirm the handoff visually on a test headset before release.

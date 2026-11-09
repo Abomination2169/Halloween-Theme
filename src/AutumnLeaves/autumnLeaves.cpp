@@ -194,12 +194,13 @@ namespace Halloween::autumnLeaves {
                 auto system = leaf->GetComponent<ParticleSystem*>();
                 if (system) {
                     // The original 1.40.8 emitter uses a 20 x 1 x 20 box
-                    // centered at (0, 7, 0). Do not inherit the 1.45.3 DustPS
-                    // shape: its distribution differs from the original.
+                    // centered at (0, 7, 0). EmitParams positions are relative
+                    // to the emitter transform at Y=7, not absolute world Y.
+                    // Passing Y=7 here placed leaves another seven units up.
                     ParticleSystem_EmitParams params{};
                     params.set_applyShapeToPosition(false);
                     params.set_position(Vector3((RandomUnit() - 0.5f) * 20.0f,
-                                                7.0f + (RandomUnit() - 0.5f),
+                                                (RandomUnit() - 0.5f),
                                                 (RandomUnit() - 0.5f) * 20.0f));
                     system->Emit(params, 1);
                 }

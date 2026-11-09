@@ -184,11 +184,19 @@ jobs:
           print("QMOD validated: 1.45.3 manifest, library, cover, and menu audio.")
           PY
 
+      - name: Record and verify QMOD SHA-256 checksum
+        run: |
+          sha256sum Halloween-Theme.qmod > Halloween-Theme.qmod.sha256
+          sha256sum --check Halloween-Theme.qmod.sha256
+          cat Halloween-Theme.qmod.sha256
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: Halloween-1453-QMOD
-          path: Halloween-Theme.qmod
+          path: |
+            Halloween-Theme.qmod
+            Halloween-Theme.qmod.sha256
           if-no-files-found: error
 
   release:

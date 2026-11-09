@@ -26,6 +26,10 @@ if "scripts/split-leaf-atlas.py" not in workflow:
     raise SystemExit("Build must split atlas into standalone PNGs")
 if "LeafVariants = 5" not in leaves or "emission.set_rateOverTime(emissionRate);" not in leaves:
     raise SystemExit("Five-emitter leaf replacement configuration missing")
+if "system->Stop(true);" not in leaves or "system->Clear(true);" not in leaves or "system->Play();" not in leaves:
+    raise SystemExit("Leaf clones must clear inherited particles and restart after configuration")
+if "emissionRate._ctor(1.0f)" not in leaves or "mainModule.set_maxParticles(30)" not in leaves:
+    raise SystemExit("Five leaf emitters must retain original aggregate emission and particle cap")
 if "ParticleController::MainModule::set_" in leaves or "Flair::ParticleSafety::HadMissingIcall()" in leaves:
     raise SystemExit("Leaves still depend on obsolete manual ICALL setters")
 if leaves.find("dustGo->active = false") < leaves.find("BSML::Utilities::LoadTextureRaw(encodedLeaves[i])"):

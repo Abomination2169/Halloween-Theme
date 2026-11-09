@@ -46,3 +46,10 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - Resolver explicitly reported that `config-utils` 2.0.3 requires beatsaber-hook 6.x and 2.0.4 requires 7.x; neither is compatible with the port's beatsaber-hook 9.3.0.
 - For the next CI experiment, the port branch removes `config-utils` and replaces its config macros with a **temporary defaults-only shim** in `include/c.hpp`. All four features remain enabled. This shim **does not load/save persistent settings**, so it is not a release-ready settings migration.
 - CI must establish the next dependency or C++ compile blocker. Do not interpret this change as a successful 1.45.3 port.
+
+## CI compile investigation (run 42631395169)
+
+- Dependency restore, QMOD manifest generation/validation and Android CMake configuration **passed**.
+- Compilation stopped on the removed `beatsaber-hook/shared/config/config-utils.hpp` header and C++20 not supporting `std::expected` used by beatsaber-hook 9.x.
+- Port branch removes the obsolete include from `include/main.hpp` and sets CMake C++ standard to 23. This addresses only the observed first-layer toolchain errors; generated API migration remains outstanding.
+- No successful port QMOD or Quest runtime validation yet.

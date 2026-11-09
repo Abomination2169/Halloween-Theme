@@ -11,7 +11,6 @@
 #include "UnityEngine/ParticleSystem.hpp"
 #include "UnityEngine/ParticleSystemRenderer.hpp"
 #include "UnityEngine/Material.hpp"
-#include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/Shader.hpp"
 #include "UnityEngine/Color.hpp"
 #include "bsml/shared/Helpers/utilities.hpp"
@@ -52,24 +51,17 @@ namespace Halloween::autumnLeaves {
         }
         if (!dustGo) return;
 
-        // The original PNG is a five-column atlas. Since the 1.45.3
-        // TextureSheetAnimationModule has no generated setters, crop each
-        // column to its own RGBA texture and run five lightweight emitters.
-        // This avoids relying on shader UV tiling, which Sprites/Default may
-        // ignore, and prevents an entire atlas appearing on each particle.
-        auto atlas = BSML::Utilities::LoadTextureRaw(
-            static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaves_png));
-        if (!atlas) {
-            WARNING("Autumn leaves: leaf atlas unavailable; retaining original menu dust");
-            return;
-        }
-
-        const int atlasWidth = atlas->get_width();
-        const int atlasHeight = atlas->get_height();
-        if (atlasWidth < LeafVariants || atlasHeight <= 0) {
-            WARNING("Autumn leaves: invalid leaf atlas dimensions; retaining original menu dust");
-            return;
-        }
+        // Build-time split of the original 1.40.8 RGBA atlas avoids
+        // Texture2D.GetPixels/SetPixels on-device (which rendered white cubes).
+        // Decode each original leaf PNG through the same BSML path that
+        // already displayed the complete atlas in color on the headset.
+        std::array<ArrayW<uint8_t>, LeafVariants> encodedLeaves = {
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaf_0_png),
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaf_1_png),
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaf_2_png),
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaf_3_png),
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaf_4_png),
+        };
 
         auto shader = Shader::Find("Sprites/Default");
         if (!shader) {
@@ -79,19 +71,12 @@ namespace Halloween::autumnLeaves {
 
         try {
             for (int i = 0; i < LeafVariants; ++i) {
-                const int left = atlasWidth * i / LeafVariants;
-                const int right = atlasWidth * (i + 1) / LeafVariants;
-                const int width = right - left;
-
-                auto pixels = atlas->GetPixels(left, 0, width, atlasHeight);
-                auto tile = Texture2D::New_ctor(width, atlasHeight);
-                if (!tile || pixels.size() != static_cast<size_t>(width * atlasHeight)) {
-                    WARNING("Autumn leaves: could not create an individual leaf texture");
+                auto tile = BSML::Utilities::LoadTextureRaw(encodedLeaves[i]);
+                if (!tile) {
+                    WARNING("Autumn leaves: standalone leaf PNG failed to decode");
                     RemoveLeafClones();
                     return;
                 }
-                tile->SetPixels(pixels);
-                tile->Apply(false);
 
                 auto clone = GameObject::Instantiate(dustGo->gameObject);
                 if (!clone) {

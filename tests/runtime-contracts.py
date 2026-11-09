@@ -28,7 +28,7 @@ if "LeafVariants = 5" not in leaves or "emission.set_rateOverTime(emissionRate);
     raise SystemExit("Five-emitter leaf replacement configuration missing")
 if "system->Stop(true);" not in leaves or "system->Clear(true);" not in leaves or "system->Play();" not in leaves:
     raise SystemExit("Leaf clones must clear inherited particles and restart after configuration")
-if "emissionRate._ctor(1.0f)" not in leaves or "mainModule.set_maxParticles(30)" not in leaves:
+if "emissionRate._ctor(1.0f)" not in leaves or "mainModule.set_maxParticles(150)" not in leaves:
     raise SystemExit("Five leaf emitters must retain original aggregate emission and particle cap")
 # The 1.45.3 collision-restoration test deliberately removes the synthetic
 # Y=0.5 particle kill plane. Require actual Unity world collision instead.
@@ -44,6 +44,17 @@ for term in (
 ):
     if term not in leaves:
         raise SystemExit(f"World leaf collision configuration missing: {term}")
+for term in (
+    "ColorOverLifetimeModule::set_enabled(system, false)",
+    "ColorBySpeedModule::set_enabled(system, false)",
+    "ShapeModule::set_shapeType(",
+    "ShapeType::Box",
+    "Vector3(20.0f, 1.0f, 20.0f)",
+    "white._ctor(Color(1, 1, 1, 1.0f))",
+    "Time::get_deltaTime() * 5.0f",
+):
+    if term not in leaves:
+        raise SystemExit(f"Original Halloween leaf behavior missing: {term}")
 if "FloorY = 0.5f" in leaves or "set_remainingLifetime(0.0f)" in leaves:
     raise SystemExit("Artificial raised floor cutoff remains in collision-restoration test")
 if "mainModule.set_simulationSpace(ParticleSystemSimulationSpace::World)" not in leaves:

@@ -30,10 +30,24 @@ if "system->Stop(true);" not in leaves or "system->Clear(true);" not in leaves o
     raise SystemExit("Leaf clones must clear inherited particles and restart after configuration")
 if "emissionRate._ctor(1.0f)" not in leaves or "mainModule.set_maxParticles(30)" not in leaves:
     raise SystemExit("Five leaf emitters must retain original aggregate emission and particle cap")
-if "UpdateLeafFloor()" not in leaves or "GetParticles(particles)" not in leaves or "SetParticles(particles, count)" not in leaves:
-    raise SystemExit("1.45.3 leaves require a supported floor cutoff")
+# The 1.45.3 collision-restoration test deliberately removes the synthetic
+# Y=0.5 particle kill plane. Require actual Unity world collision instead.
+if "UpdateLeafFloor()" not in leaves or "system->Emit(1)" not in leaves:
+    raise SystemExit("Working 1.45.3 emission path was removed")
+for term in (
+    "collision.set_enabled(true)",
+    "collision.set_type(ParticleSystemCollisionType::World)",
+    "collision.set_collidesWith(LayerMask(-1))",
+    "collision.set_dampen(dampen)",
+    "collision.set_bounce(bounce)",
+    "collision.set_lifetimeLoss(lifetimeLoss)",
+):
+    if term not in leaves:
+        raise SystemExit(f"World leaf collision configuration missing: {term}")
+if "FloorY = 0.5f" in leaves or "set_remainingLifetime(0.0f)" in leaves:
+    raise SystemExit("Artificial raised floor cutoff remains in collision-restoration test")
 if "mainModule.set_simulationSpace(ParticleSystemSimulationSpace::World)" not in leaves:
-    raise SystemExit("Floor cutoff requires world-space particle positions")
+    raise SystemExit("Leaf particles must simulate in world space")
 if "ParticleController::MainModule::set_" in leaves or "Flair::ParticleSafety::HadMissingIcall()" in leaves:
     raise SystemExit("Leaves still depend on obsolete manual ICALL setters")
 if leaves.find("dustGo->active = false") < leaves.find("BSML::Utilities::LoadTextureRaw(encodedLeaves[i])"):

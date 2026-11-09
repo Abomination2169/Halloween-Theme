@@ -136,3 +136,9 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - Added `tests/settings-smoke.cpp` to exercise first-run file creation, save/reload of disabled features, invalid and unknown settings, and non-destructive handling of malformed files.
 - The production Android settings path is unchanged; `HALLOWEEN_SETTINGS_PATH` is overridable only for isolated host testing. GitHub Actions compiles and runs the same `include/c.hpp` implementation using a temporary Linux file path before Android build.
 - This is host-side validation, **not** proof that Quest 3 storage permissions or the in-game effects behave correctly. Keep the draft PR and release gate in place.
+
+## Autumn leaves runtime safety audit (2026-11-09)
+
+- The particle clone no longer disables the original Beat Saber `DustPS` object. Previously, missing particle components or texture setup could leave the original dust disabled, and cleanup would reactivate an object the mod did not own. This avoids changing the base environment state at the cost of displaying original dust alongside leaves.
+- Added checks for the cloned `ParticleSystem`, `ParticleSystemRenderer`, texture, and material before use; a failed clone is destroyed rather than dereferenced.
+- These changes need CI compilation and Quest runtime testing. The many legacy `resolve_icall(...).value()` calls remain a **separate** potential runtime-failure risk and have not yet been resolved.

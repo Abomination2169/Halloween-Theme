@@ -53,3 +53,17 @@ for filename in ("UnityEngine/zzzz__ParticleSystem_def.hpp",
                                  "get_startLifetime(", "get_velocity(", "set_velocity(",
                                  "GetBursts", "SetBursts", "burstCount", "Clear(", "Stop(")):
             print(line.strip()[:300])
+
+print("--- Frame callback API and particle position ---")
+for filename, needles in (
+    ("GlobalNamespace/zzzz__MainMenuViewController_def.hpp", ("Update(", "LateUpdate(", "DidDeactivate(")),
+    ("UnityEngine/zzzz__Application_def.hpp", ("onBeforeRender", "onBeforeRender", "add_onBeforeRender")),
+    ("UnityEngine/zzzz__ParticleSystem_def.hpp", ("struct ParticleSystem_Particle", "get_position", "set_position", "get_remainingLifetime", "set_remainingLifetime", "get_velocity", "set_velocity", "get_particleCount")),
+):
+    p = Path("extern/includes/bs-cordl/include") / filename
+    if not p.exists():
+        print("MISSING", p)
+        continue
+    for line in p.read_text(encoding="utf-8").splitlines():
+        if any(n in line for n in needles):
+            print(line.strip()[:300])

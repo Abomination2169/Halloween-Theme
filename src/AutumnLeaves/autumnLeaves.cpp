@@ -195,28 +195,8 @@ namespace Halloween::autumnLeaves {
         // Prevent a paused menu from accumulating an emission backlog.
         if (emissionAccumulator > 3.0f) emissionAccumulator = 0.0f;
 
-        // Quest diagnostics: sample observed particles rather than assuming
-        // five cloned DustPS emitters follow the 1.40.8 behavior.
-        diagnosticsElapsed += Time::get_deltaTime();
-        if (diagnosticsElapsed >= 5.0f) {
-            int alive = 0;
-            for (auto& leaf : leafObjects) {
-                if (!leaf) continue;
-                auto ps = leaf->GetComponent<ParticleSystem*>();
-                if (ps) alive += ps->get_particleCount();
-            }
-            INFO("AutumnLeaves1453 DIAG seconds={} emitted={} alive={} removedBelowY0={}",
-                 diagnosticsElapsed, diagnosticsEmitted, alive, diagnosticsFloorRemoved);
-            diagnosticsElapsed = 0.0f;
-            diagnosticsEmitted = 0;
-            diagnosticsFloorRemoved = 0;
-        }
-
-        // 1.45.3 lacks CollisionModule setters. Remove particles crossing
-        // the menu floor; this is a floor cutoff, not physical bouncing.
-        static int frameCounter = 0;
-        if (++frameCounter % 3 != 0) return;
-
+        // Cut off below-floor particles on every frame rather than every third
+        // frame. This remains a cutoff, not Unity world collision.
         constexpr float FloorY = 0.0f;
         constexpr int MaxPerEmitter = 30;
         for (auto& leaf : leafObjects) {
@@ -236,6 +216,24 @@ namespace Halloween::autumnLeaves {
             }
             if (changed) system->SetParticles(particles, count);
         }
+        // Quest diagnostics: sample observed particles rather than assuming
+        // five cloned DustPS emitters follow the 1.40.8 behavior.
+        diagnosticsElapsed += Time::get_deltaTime();
+        if (diagnosticsElapsed >= 5.0f) {
+            int alive = 0;
+            for (auto& leaf : leafObjects) {
+                if (!leaf) continue;
+                auto ps = leaf->GetComponent<ParticleSystem*>();
+                if (ps) alive += ps->get_particleCount();
+            }
+            INFO("AutumnLeaves1453 DIAG seconds={} emitted={} alive={} removedBelowY0={}",
+                 diagnosticsElapsed, diagnosticsEmitted, alive, diagnosticsFloorRemoved);
+            diagnosticsElapsed = 0.0f;
+            diagnosticsEmitted = 0;
+            diagnosticsFloorRemoved = 0;
+        }
+
+
     }
 
     void DestroyAutumnLeaves() {

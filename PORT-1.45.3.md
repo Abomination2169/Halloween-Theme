@@ -1,6 +1,6 @@
 # Halloween Theme — Beat Saber 1.45.3 Quest 3 port
 
-Status: **port preparation; no 1.45.3 QMOD has been compiled or tested**.
+Status: **first 1.45.3 metadata/dependency build candidate staged; compilation and runtime compatibility are unverified**.
 
 ## Preservation rules
 
@@ -13,7 +13,8 @@ Status: **port preparation; no 1.45.3 QMOD has been compiled or tested**.
 
 - QuestPackageManager/bsqmods has a `mods/1.45.3_30054` directory, identifying the target Quest package build.
 - Its 1.45.3 listings include `bsml` 0.6.6, `custom-types` 0.21.2, and `paper2_scotland2` 4.8.0.
-- The 1.45.3 BSML and custom-types listings depend on `beatsaber-hook` ^9.3.0. This is a major change from our 1.40.8 dependency ^6.4.2.
+- The 1.45.3 BSML and custom-types listings depend on `beatsaber-hook` ^9.3.0.
+- QuestPackageManager/bs-cordl published `v4503.0.0` on 2026-10-15. This is the selected candidate generated-header version; CI must establish compatibility. This is a major change from our 1.40.8 dependency ^6.4.2.
 - These are **distribution-listing versions**, not proof that the Halloween C++ APIs or a matching QPM header set compile.
 
 Sources:
@@ -23,10 +24,10 @@ Sources:
 
 ## Porting sequence
 
-1. Identify and pin a **1.45.3-compatible bs-cordl/game bindings** package, plus matching QPM versions for Scotland2, config-utils, beatsaber-hook, BSML, custom-types, and Paperlog. Do not guess a bs-cordl version.
-2. Update `qpm.json` and any generated/locked QPM metadata on this branch only.
-3. Change the port's `mod.template.json` `packageVersion` to `1.45.3_30054`; assign a distinct port version before packaging. Keep `id: halloween` and `libhalloween.so`.
-4. Update build validation to check the new target without weakening the existing 1.40.8 checks on `main`.
+1. **Staged:** Pin the `bs-cordl` ^4503.0.0 candidate and update QPM dependencies to beatsaber-hook ^9.3.0, BSML ^0.6.6, custom-types ^0.21.2 and Paperlog ^4.8.0. Scotland2 and config-utils remain on their previous ranges pending compatibility evidence.
+2. **Staged:** Update `qpm.json` on this branch only. QPM restore/lock resolution must be validated in CI.
+3. **Staged:** Set `mod.template.json` `packageVersion` to `1.45.3_30054` and development mod version to `1.1.0` (not published). Keep `id: halloween` and `libhalloween.so`.
+4. **Staged:** Update the port branch's CI checks to target 1.45.3, leaving the existing 1.40.8 checks on `main` unchanged.
 5. Compile and fix C++ API differences, especially `SongPreviewPlayer`, `MediaAsyncLoader`, `MainMenuViewController`, `LightWithIdManager`, `BSML::Lite`, and particle APIs.
 6. Verify QMOD archive manifest, assets, fileCopies, and library.
 7. Test on a **separate 1.45.3 Quest setup** only after CI passes. Compare music, menu geometry, lights, leaf colors, sign, transitions, and repeated menu visits.
@@ -34,7 +35,7 @@ Sources:
 
 ## Current blockers
 
-- A verified compatible 1.45.3 generated-header/bs-cordl package and matching build toolchain have not yet been established.
+- `bs-cordl` ^4503.0.0 is a published candidate; QPM restore and API compatibility have not yet been established.
 - No ARM64 compile or runtime verification has been completed for 1.45.3.
 
-This file is preparatory documentation and does not change runtime behavior.
+The staged metadata and CI target changes do not modify the Halloween runtime source. The port is not yet a validated QMOD.

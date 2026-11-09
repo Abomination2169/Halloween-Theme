@@ -1,5 +1,6 @@
 #include "AutumnLeaves/autumnLeaves.hpp"
 #include "main.hpp"
+#include "beatsaber-hook/shared/safeptr.hpp"
 #include "assets.hpp"
 #include "UnityEngine/Shader.hpp"
 #include "logging.hpp"
@@ -24,8 +25,8 @@ using namespace Flair;
 
 namespace Halloween::autumnLeaves {
 
-    SafePtrUnity<GameObject> dustGo;
-    SafePtrUnity<GameObject> autumnLeavesGo;
+    safe_ptr<GameObject*> dustGo;
+    safe_ptr<GameObject*> autumnLeavesGo;
 
     void CreateAutumnLeaves() {
         // Don't create if already created

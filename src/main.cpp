@@ -192,6 +192,14 @@ MAKE_HOOK_MATCH(AutumnLeavesInit, &GlobalNamespace::MainMenuViewController::DidA
 }
 
 
+// Update only while the main menu is active. The original 1.40.8 mod
+// used native world collision, but those setters are stripped in 1.45.3.
+MAKE_HOOK_MATCH(AutumnLeavesUpdate, &GlobalNamespace::MainMenuViewController::Update, void, GlobalNamespace::MainMenuViewController* self) {
+    AutumnLeavesUpdate(self);
+    if (getModConfig().EnableAutumnLeaves.GetValue())
+        Halloween::autumnLeaves::UpdateLeafFloor();
+}
+
 // Called at the early stages of game loading
 MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
     *info = modInfo.to_c();
@@ -214,6 +222,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
     // Keep the game's original Beat Saber logo; no logo replacement code is compiled.
     INSTALL_HOOK(PaperLogger, OverrideEnvironmentColors);
     INSTALL_HOOK(PaperLogger, AutumnLeavesInit);
+    INSTALL_HOOK(PaperLogger, AutumnLeavesUpdate);
 
     INSTALL_HOOK(PaperLogger, SongPreviewPlayer_OnEnable);
     INSTALL_HOOK(PaperLogger, SongPreviewPlayer_CrossfadeTo);

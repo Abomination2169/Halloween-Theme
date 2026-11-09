@@ -17,7 +17,7 @@ assert manifest["packageVersion"] == "1.45.3_30054"
 assert qpm["info"]["additionalData"]["overrideSoName"] == "libhalloween.so"
 assert (root / manifest["coverImage"]).is_file()
 assert '#include "c.hpp"' in source
-assert "DECLARE_CONFIG(ModConfig)" in config
+assert "struct ModConfig" in config
 assert "getModConfig().Init(modInfo)" in source
 
 # Ignore commented-out legacy hooks and declarations.

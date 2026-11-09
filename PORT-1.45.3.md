@@ -67,3 +67,12 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - Current primary upstream header problem: beatsaber-hook 9.4.3 `shared/find.hpp:73` declares a `constexpr` constructor accepting `i2c::view`, whose constructors in `shared/utils.hpp` are not `constexpr`. Clang rejects this, causing cascaded generated `bs-cordl` errors. This must be resolved against upstream compatibility, **not** by bulk-editing generated headers.
 - A separate local issue is the asset generator's obsolete `beatsaber-hook/shared/utils/typedefs.h` include; the port's `assets.cmake` was updated to use `shared/arrayw.hpp` and `i2c::class_of`. This change is pending CI verification.
 - The port still needs updated hooks and a settings implementation; no 1.45.3 QMOD is validated.
+
+
+## CI investigation: run 42632764024
+
+- Dependency installation, manifest validation and CMake configuration passed; compilation failed.
+- The previous missing `typedefs.h` error is no longer present after updating `assets.cmake`.
+- The earliest persistent failure comes from beatsaber-hook's `shared/find.hpp`: a `constexpr find_method_info` constructor takes non-literal `i2c::view` parameters; this causes cascaded generated `bs-cordl` constructor errors. The same declaration appears in upstream beatsaber-hook `v9.4.3` and `master` as checked on 2026-11-09.
+- A strictly guarded, **CI-only diagnostic** in `scripts/diagnose-hook-constexpr.py` removes `constexpr` from exactly this one dependency declaration after QPM restore. It refuses to run if the upstream declaration differs. This is not a runtime fix or an upstream source change; assess its compiler result and replace it with an upstream-supported solution before release.
+- Do not deploy any build until all APIs, packages and game behavior pass validation.

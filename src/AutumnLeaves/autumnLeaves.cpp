@@ -29,6 +29,9 @@ namespace Halloween::autumnLeaves {
         safe_ptr<GameObject*> dustGo;
         float emissionAccumulator = 0.0f;
         int nextLeafVariant = 0;
+        float diagnosticsElapsed = 0.0f;
+        int diagnosticsEmitted = 0;
+        int diagnosticsFloorRemoved = 0;
 
         void RemoveLeafClones() {
             for (auto& leaf : leafObjects) {
@@ -44,6 +47,9 @@ namespace Halloween::autumnLeaves {
         if (leafObjects[0]) return;
         emissionAccumulator = 0.0f;
         nextLeafVariant = 0;
+        diagnosticsElapsed = 0.0f;
+        diagnosticsEmitted = 0;
+        diagnosticsFloorRemoved = 0;
 
         // Find the original menu dust emitter, which supplies working motion
         // and geometry on Beat Saber 1.45.3.
@@ -184,9 +190,27 @@ namespace Halloween::autumnLeaves {
             nextLeafVariant = (nextLeafVariant + 1) % LeafVariants;
             emissionAccumulator -= 1.0f;
             ++emittedThisFrame;
+            ++diagnosticsEmitted;
         }
         // Prevent a paused menu from accumulating an emission backlog.
         if (emissionAccumulator > 3.0f) emissionAccumulator = 0.0f;
+
+        // Quest diagnostics: sample observed particles rather than assuming
+        // five cloned DustPS emitters follow the 1.40.8 behavior.
+        diagnosticsElapsed += Time::get_deltaTime();
+        if (diagnosticsElapsed >= 5.0f) {
+            int alive = 0;
+            for (auto& leaf : leafObjects) {
+                if (!leaf) continue;
+                auto ps = leaf->GetComponent<ParticleSystem*>();
+                if (ps) alive += ps->get_particleCount();
+            }
+            INFO("AutumnLeaves1453 DIAG seconds={} emitted={} alive={} removedBelowY0={}",
+                 diagnosticsElapsed, diagnosticsEmitted, alive, diagnosticsFloorRemoved);
+            diagnosticsElapsed = 0.0f;
+            diagnosticsEmitted = 0;
+            diagnosticsFloorRemoved = 0;
+        }
 
         // 1.45.3 lacks CollisionModule setters. Remove particles crossing
         // the menu floor; this is a floor cutoff, not physical bouncing.
@@ -206,6 +230,7 @@ namespace Halloween::autumnLeaves {
             for (int j = 0; j < count; ++j) {
                 if (particles[j].m_Position.y < FloorY) {
                     particles[j].set_remainingLifetime(0.0f);
+                    ++diagnosticsFloorRemoved;
                     changed = true;
                 }
             }

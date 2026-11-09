@@ -84,3 +84,10 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - Compilation then failed on legacy `il2cpp_utils::resolve_icall`, `Array::get_Length()`, `SafePtrUnity`, and `il2cpp_functions::Init()` APIs.
 - First-pass branch-only replacements use `i2c::resolve_icall(...).value()`, `Array::max_length`, `safe_ptr<UnityEngine::GameObject*>`, and `i2c::functions::initialize()`. These changes are **compiler candidates**, not gameplay-tested modifications.
 - Review `safe_ptr` lifecycle, Unity object destruction and particle-system icall signatures before any Quest installation. CI must prove the build first.
+
+## Run 42633805936 — source compilation passes
+
+- All seven C++ translation units compiled successfully, including Halloween music, leaves, pumpkins, hooks, and menu effects.
+- Linking `libhalloween.so` failed on `flamingo::Install(flamingo::HookInfo&&)`. The link command did not include `libflamingo.so`, even though the restored beatsaber-hook headers refer to Flamingo.
+- Added a direct `flamingo` QPM dependency `^1.3.1` on the **port branch only** so the generated QPM link configuration includes its library (to be confirmed in the next CI run).
+- A successful link is not proof of runtime compatibility; the guarded upstream-header diagnostic, configuration shim, and Quest runtime behavior still require validation before installation.

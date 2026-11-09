@@ -81,3 +81,35 @@ p = Path("extern/includes/bs-cordl/include/UnityEngine/zzzz__ParticleSystem_def.
 for line in p.read_text(encoding="utf-8").splitlines():
     if " Emit(" in line or " Play(" in line:
         print(line.strip()[:300])
+
+print("--- Texture-sheet and collision methods from generated Unity headers ---")
+for filename in (
+    "UnityEngine/zzzz__ParticleSystem_def.hpp",
+    "UnityEngine/zzzz__ParticleSystem_TextureSheetAnimationModule_def.hpp",
+    "UnityEngine/zzzz__ParticleSystem_CollisionModule_def.hpp",
+):
+    p = Path("extern/includes/bs-cordl/include") / filename
+    if not p.exists():
+        print("MISSING", filename)
+        continue
+    source = p.read_text(encoding="utf-8")
+    for marker in ("struct CORDL_TYPE ParticleSystem_TextureSheetAnimationModule",
+                   "struct CORDL_TYPE ParticleSystem_CollisionModule"):
+        start = source.find(marker)
+        if start < 0:
+            continue
+        end = source.find("\n};", start)
+        section = source[start:end if end > start else start + 10000]
+        print(filename, marker)
+        print("\n".join(x.strip()[:260] for x in section.splitlines()
+                        if any(z in x for z in ("set_", "get_", "m_ParticleSystem", "m_Enabled", "m_NumTiles", "m_Type", "m_Mode"))))
+print("--- Generated IL2CPP method lookup helpers ---")
+for filename in (
+    "beatsaber-hook/shared/utils/il2cpp-utils-methods.hpp",
+    "beatsaber-hook/shared/utils/il2cpp-utils.hpp",
+):
+    p = Path("extern/includes") / filename
+    if p.exists():
+        for line in p.read_text(encoding="utf-8").splitlines():
+            if any(term in line for term in ("FindMethod", "RunMethod", "FindClass", "GetMethod", "resolve_icall")):
+                print(filename, line.strip()[:260])

@@ -20,6 +20,7 @@
    ```
    Read the reported version; do **not** proceed on 1.40.8.
 4. Download the **latest green, matching-commit** `Halloween-1453-QMOD` artifact from the draft PR's workflow. Extract the artifact ZIP to obtain `Halloween-Theme.qmod`.
+   - The artifact also includes `Halloween-Theme.qmod.sha256`. From the extracted folder, verify the SHA-256 hash against the checksum file (for example, `Get-FileHash .\Halloween-Theme.qmod -Algorithm SHA256` in PowerShell). Match it against the checksum produced in the same successful GitHub Actions run. Do not use artifacts from a failed or older commit.
 5. Inspect the QMOD manifest if desired (`.qmod` is a ZIP archive). Verify `id=halloween`, `version=1.1.0`, `packageVersion=1.45.3_30054`, and an intact `libhalloween.so`, banner, and `Ghostly_Horror_Menu.ogg`. CI enforces these on build.
 6. Using the current QuestPatcher for the **matching game version**, confirm availability of the five declared runtime dependencies: paper2_scotland2, beatsaber-hook, BSML, Custom Types, Flamingo. Do not mix 1.40.8 dependency QMODs into 1.45.3.
 

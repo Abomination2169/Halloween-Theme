@@ -9,6 +9,8 @@
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/ParticleSystem.hpp"
+#include "UnityEngine/ParticleSystemSimulationSpace.hpp"
+#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "UnityEngine/ParticleSystemRenderer.hpp"
 #include "UnityEngine/Material.hpp"
 #include "UnityEngine/Shader.hpp"
@@ -125,6 +127,7 @@ namespace Halloween::autumnLeaves {
                 mainModule.set_maxParticles(30);
                 mainModule.set_gravityModifierMultiplier(0.025f);
                 mainModule.set_startColor(white);
+                mainModule.set_simulationSpace(ParticleSystemSimulationSpace::World);
 
                 // A cloned DustPS may contain already-simulated particles.
                 // Reset it so five clones do not multiply the initial burst.
@@ -154,6 +157,34 @@ namespace Halloween::autumnLeaves {
             }
         }
         INFO("Autumn leaves: five individual leaf textures active; original menu dust disabled");
+    }
+
+    void UpdateLeafFloor() {
+        // CollisionModule setters were stripped in Beat Saber 1.45.3.
+        // Instead, remove particles only when they reach the menu floor.
+        // This is a visual floor cutoff, not a replacement for physics bounce.
+        // Check every third menu frame to limit managed-array allocations.
+        static int frameCounter = 0;
+        if (++frameCounter % 3 != 0 || !leafObjects[0]) return;
+
+        constexpr float FloorY = 0.0f;
+        constexpr int MaxPerEmitter = 30;
+        for (auto& leaf : leafObjects) {
+            if (!leaf) continue;
+            auto system = leaf->GetComponent<ParticleSystem*>();
+            if (!system) continue;
+            auto particles = il2cpp_utils::NewArray<ParticleSystem_Particle>(MaxPerEmitter);
+            if (!particles) continue;
+            int count = system->GetParticles(particles);
+            bool changed = false;
+            for (int j = 0; j < count; ++j) {
+                if (particles[j].m_Position.y < FloorY) {
+                    particles[j].set_remainingLifetime(0.0f);
+                    changed = true;
+                }
+            }
+            if (changed) system->SetParticles(particles, count);
+        }
     }
 
     void DestroyAutumnLeaves() {

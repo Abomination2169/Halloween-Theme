@@ -68,48 +68,34 @@ namespace Halloween::autumnLeaves {
         autumnLeavesGo->transform->position = UnityEngine::Vector3(0.0f, 7.0f, 0.0f);
         autumnLeavesGo->transform->rotation = UnityEngine::Quaternion::Euler(UnityEngine::Vector3(0.0f, 0.0f, 0.0f));
 
-        // Track missing runtime Unity calls so we never suppress the base dust
-        // when the Halloween leaf particle system could not be configured.
-        Flair::ParticleSafety::Reset();
-        // Use Flair's ParticleController to modify ParticleSystem properties to warp the dust into autumnLeaves
-        ParticleController::MainModule::set_startLifetime(autumnLeaves, 14.0f);
-        ParticleController::MainModule::set_startSize(autumnLeaves, 0.18);
-        ParticleController::MainModule::set_maxParticles(autumnLeaves, 150);
-        ParticleController::MainModule::set_gravityModifier(autumnLeaves, 0.025f);
-// Preserve the original RGB colors of the autumn leaves.
-ParticleController::MinMaxGradient leafColor{};
+        // Use the generated Unity bindings rather than obsolete manually-resolved
+        // ParticleSystem module internal calls. These are versioned with the game.
+        auto mainModule = autumnLeaves->main;
+        mainModule.set_startLifetime(UnityEngine::ParticleSystem::MinMaxCurve(14.0f));
+        mainModule.set_startSize(UnityEngine::ParticleSystem::MinMaxCurve(0.18f));
+        mainModule.set_maxParticles(150);
+        mainModule.set_gravityModifier(UnityEngine::ParticleSystem::MinMaxCurve(0.025f));
+        mainModule.set_startColor(UnityEngine::ParticleSystem::MinMaxGradient(UnityEngine::Color(1, 1, 1, 1)));
 
-leafColor.mode = ParticleController::GradientMode::Color;
-leafColor.colorMin = UnityEngine::Color(1.0f, 1.0f, 1.0f, 1.0f);
-leafColor.colorMax = UnityEngine::Color(1.0f, 1.0f, 1.0f, 1.0f);
-
-ParticleController::MainModule::set_startColor(
-    autumnLeaves,
-    leafColor
-);
-
-// Disable inherited particle color animation.
-ParticleController::ColorOverLifetimeModule::set_enabled(
-    autumnLeaves,
-    false
-);
-
-ParticleController::ColorBySpeedModule::set_enabled(
-    autumnLeaves,
-    false
-);
-        ParticleController::EmissionModule::set_enabled(autumnLeaves, true); // ParticleTuner compatibility
-        ParticleController::EmissionModule::set_rateOverTime(autumnLeaves, 5);
-        ParticleController::ShapeModule::set_shapeType(autumnLeaves, ParticleController::ShapeType::Box);
-        ParticleController::ShapeModule::set_position(autumnLeaves, UnityEngine::Vector3(0.0f, 0.0f, 0.0f));
-        ParticleController::ShapeModule::set_rotation(autumnLeaves, UnityEngine::Vector3(0.0f, 0.0f, 0.0f));
-        ParticleController::ShapeModule::set_scale(autumnLeaves, UnityEngine::Vector3(20.0f, 1.0f, 20.0f));
-        ParticleController::CollisionModule::set_enabled(autumnLeaves, true);
-        ParticleController::CollisionModule::set_type(autumnLeaves, ParticleController::CollisionType::World);
-        ParticleController::CollisionModule::set_collidesWith(autumnLeaves, UnityEngine::LayerMask(0xffffffff));
-        ParticleController::CollisionModule::set_dampen(autumnLeaves, 0.08f);
-        ParticleController::CollisionModule::set_bounce(autumnLeaves, 0.0f);
-        ParticleController::CollisionModule::set_lifetimeLoss(autumnLeaves, 0.02);
+        auto colorOverLifetime = autumnLeaves->colorOverLifetime;
+        colorOverLifetime.set_enabled(false);
+        auto colorBySpeed = autumnLeaves->colorBySpeed;
+        colorBySpeed.set_enabled(false);
+        auto emission = autumnLeaves->emission;
+        emission.set_enabled(true);
+        emission.set_rateOverTime(UnityEngine::ParticleSystem::MinMaxCurve(5.0f));
+        auto shape = autumnLeaves->shape;
+        shape.set_shapeType(UnityEngine::ParticleSystemShapeType::Box);
+        shape.set_position(UnityEngine::Vector3(0, 0, 0));
+        shape.set_rotation(UnityEngine::Vector3(0, 0, 0));
+        shape.set_scale(UnityEngine::Vector3(20, 1, 20));
+        auto collision = autumnLeaves->collision;
+        collision.set_enabled(true);
+        collision.set_type(UnityEngine::ParticleSystemCollisionType::World);
+        collision.set_collidesWith(UnityEngine::LayerMask(0xffffffff));
+        collision.set_dampen(UnityEngine::ParticleSystem::MinMaxCurve(0.08f));
+        collision.set_bounce(UnityEngine::ParticleSystem::MinMaxCurve(0.0f));
+        collision.set_lifetimeLoss(UnityEngine::ParticleSystem::MinMaxCurve(0.02f));
         const int numLeafSprites = 5;
         auto leafTexture = BSML::Utilities::LoadTextureRaw(static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaves_png));
         auto leafMaterial = particleRenderer->get_material();
@@ -135,20 +121,14 @@ if (leafShader && particleRenderer) {
 } else {
     WARNING("Autumn leaves: Sprites/Default shader not found; using original material");
 }
-        ParticleController::TextureSheetAnimationModule::set_enabled(autumnLeaves, true);
-        ParticleController::TextureSheetAnimationModule::set_mode(autumnLeaves, ParticleController::AnimationMode::Grid);
-        ParticleController::TextureSheetAnimationModule::set_numTilesX(autumnLeaves, numLeafSprites);
-        ParticleController::TextureSheetAnimationModule::set_numTilesY(autumnLeaves, 1);
-        ParticleController::TextureSheetAnimationModule::set_frameOverTime(autumnLeaves, ParticleController::MinMaxCurve(0.0f, numLeafSprites));
-        ParticleController::TextureSheetAnimationModule::set_startFrame(autumnLeaves, ParticleController::MinMaxCurve(0.0f, numLeafSprites));
-        ParticleController::TextureSheetAnimationModule::set_cycleCount(autumnLeaves, 0);
-
-        if (Flair::ParticleSafety::HadMissingIcall()) {
-            WARNING("Autumn leaves: required particle call unavailable; retaining original menu dust");
-            GameObject::Destroy(autumnLeavesGo->gameObject);
-            autumnLeavesGo = nullptr;
-            return;
-        }
+        auto textureSheet = autumnLeaves->textureSheetAnimation;
+        textureSheet.set_enabled(true);
+        textureSheet.set_mode(UnityEngine::ParticleSystemAnimationMode::Grid);
+        textureSheet.set_numTilesX(numLeafSprites);
+        textureSheet.set_numTilesY(1);
+        textureSheet.set_frameOverTime(UnityEngine::ParticleSystem::MinMaxCurve(0.0f, numLeafSprites));
+        textureSheet.set_startFrame(UnityEngine::ParticleSystem::MinMaxCurve(0.0f, numLeafSprites));
+        textureSheet.set_cycleCount(0);
 
         // Keep the template dust active until the leaves have been configured.
         // Only replace the original menu effect after the clone is ready.

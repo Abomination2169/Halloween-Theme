@@ -10,7 +10,6 @@
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/ParticleSystem.hpp"
 #include "UnityEngine/ParticleSystemSimulationSpace.hpp"
-#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "UnityEngine/ParticleSystemRenderer.hpp"
 #include "UnityEngine/Material.hpp"
 #include "UnityEngine/Shader.hpp"
@@ -200,7 +199,7 @@ namespace Halloween::autumnLeaves {
             if (!leaf) continue;
             auto system = leaf->GetComponent<ParticleSystem*>();
             if (!system) continue;
-            auto particles = il2cpp_utils::NewArray<ParticleSystem_Particle>(MaxPerEmitter);
+            ArrayW<ParticleSystem_Particle> particles(MaxPerEmitter);
             if (!particles) continue;
             int count = system->GetParticles(particles);
             bool changed = false;

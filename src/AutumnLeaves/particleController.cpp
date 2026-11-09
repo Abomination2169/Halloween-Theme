@@ -3,6 +3,19 @@
 
 #include "UnityEngine/GameObject.hpp"
 
+namespace {
+    bool g_missingParticleIcall = false;
+}
+
+namespace Flair::ParticleSafety {
+    void Reset() { g_missingParticleIcall = false; }
+    bool HadMissingIcall() { return g_missingParticleIcall; }
+    void MarkMissing(const char* callName) {
+        g_missingParticleIcall = true;
+        WARNING("Halloween leaves: missing required Unity particle internal call: {}", callName);
+    }
+}
+
 // Define a setter and getter function for a property that directly returns the value
 #define DEFINE_FIELD_SETGET_DIRECT(moduleType, moduleName, propertyType, propertyName) \
 propertyType Flair::ParticleController::moduleType::get_##propertyName(UnityEngine::ParticleSystem* particleSystem) { \
@@ -13,7 +26,7 @@ propertyType Flair::ParticleController::moduleType::get_##propertyName(UnityEngi
 } \
 void Flair::ParticleController::moduleType::set_##propertyName(UnityEngine::ParticleSystem* particleSystem, propertyType value) { \
     static auto SetterFunc = i2c::resolve_icall<void, UnityEngine::ParticleSystem::moduleType*, propertyType>("UnityEngine.ParticleSystem/" #moduleType "::set_" #propertyName "_Injected").value_or(nullptr); \
-    if (!SetterFunc || !particleSystem) return; \
+    if (!SetterFunc || !particleSystem) { Flair::ParticleSafety::MarkMissing("UnityEngine.ParticleSystem/" #moduleType "::set_" #propertyName "_Injected"); return; } \
     UnityEngine::ParticleSystem::moduleType moduleObj = particleSystem->moduleName; \
     SetterFunc(&moduleObj, value); \
 }
@@ -30,7 +43,7 @@ propertyType Flair::ParticleController::moduleType::get_##propertyName(UnityEngi
 } \
 void Flair::ParticleController::moduleType::set_##propertyName(UnityEngine::ParticleSystem *particleSystem, propertyType value) { \
     static auto SetterFunc = i2c::resolve_icall<void, UnityEngine::ParticleSystem::moduleType*, propertyType*>("UnityEngine.ParticleSystem/" #moduleType "::set_" #propertyName "_Injected").value_or(nullptr); \
-    if (!SetterFunc || !particleSystem) return; \
+    if (!SetterFunc || !particleSystem) { Flair::ParticleSafety::MarkMissing("UnityEngine.ParticleSystem/" #moduleType "::set_" #propertyName "_Injected"); return; } \
     UnityEngine::ParticleSystem::moduleType moduleObj = particleSystem->moduleName; \
     SetterFunc(&moduleObj, &value); \
 }
@@ -38,7 +51,7 @@ void Flair::ParticleController::moduleType::set_##propertyName(UnityEngine::Part
 #define DEFINE_VOID_1(moduleType, moduleName, funcName, para1Type, para1Name) \
 void Flair::ParticleController::moduleType::funcName(UnityEngine::ParticleSystem* particleSystem, para1Type para1Name) { \
     static auto Func = i2c::resolve_icall<void, UnityEngine::ParticleSystem::moduleType*, para1Type>("UnityEngine.ParticleSystem/" #moduleType "::" #funcName "_Injected").value_or(nullptr); \
-    if (!Func || !particleSystem) return; \
+    if (!Func || !particleSystem) { Flair::ParticleSafety::MarkMissing("UnityEngine.ParticleSystem/" #moduleType "::" #funcName "_Injected"); return; } \
     UnityEngine::ParticleSystem::moduleType moduleObj = particleSystem->moduleName; \
     Func(&moduleObj, para1Name); \
 }
@@ -46,7 +59,7 @@ void Flair::ParticleController::moduleType::funcName(UnityEngine::ParticleSystem
 #define DEFINE_VOID_2(moduleType, moduleName, funcName, para1Type, para1Name, para2Type, para2Name) \
 void Flair::ParticleController::moduleType::funcName(UnityEngine::ParticleSystem* particleSystem, para1Type para1Name, para2Type para2Name) { \
     static auto Func = i2c::resolve_icall<void, UnityEngine::ParticleSystem::moduleType*, para1Type, para2Type>("UnityEngine.ParticleSystem/" #moduleType "::" #funcName "_Injected").value_or(nullptr); \
-    if (!Func || !particleSystem) return; \
+    if (!Func || !particleSystem) { Flair::ParticleSafety::MarkMissing("UnityEngine.ParticleSystem/" #moduleType "::" #funcName "_Injected"); return; } \
     UnityEngine::ParticleSystem::moduleType moduleObj = particleSystem->moduleName; \
     Func(&moduleObj, para1Name, para2Name); \
 }
@@ -54,7 +67,7 @@ void Flair::ParticleController::moduleType::funcName(UnityEngine::ParticleSystem
 #define DEFINE_VOID_4(moduleType, moduleName, funcName, para1Type, para1Name, para2Type, para2Name, para3Type, para3Name, para4Type, para4Name) \
 void Flair::ParticleController::moduleType::funcName(UnityEngine::ParticleSystem* particleSystem, para1Type para1Name, para2Type para2Name, para3Type para3Name, para4Type para4Name) { \
     static auto Func = i2c::resolve_icall<void, UnityEngine::ParticleSystem::moduleType*, para1Type, para2Type, para3Type, para4Type>("UnityEngine.ParticleSystem/" #moduleType "::" #funcName "_Injected").value_or(nullptr); \
-    if (!Func || !particleSystem) return; \
+    if (!Func || !particleSystem) { Flair::ParticleSafety::MarkMissing("UnityEngine.ParticleSystem/" #moduleType "::" #funcName "_Injected"); return; } \
     UnityEngine::ParticleSystem::moduleType moduleObj = particleSystem->moduleName; \
     Func(&moduleObj, para1Name, para2Name, para3Name, para4Name); \
 }

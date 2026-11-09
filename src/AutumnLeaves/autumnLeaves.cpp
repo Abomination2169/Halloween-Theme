@@ -135,11 +135,19 @@ if (leafShader && particleRenderer) {
         ParticleController::TextureSheetAnimationModule::set_frameOverTime(autumnLeaves, ParticleController::MinMaxCurve(0.0f, numLeafSprites));
         ParticleController::TextureSheetAnimationModule::set_startFrame(autumnLeaves, ParticleController::MinMaxCurve(0.0f, numLeafSprites));
         ParticleController::TextureSheetAnimationModule::set_cycleCount(autumnLeaves, 0);
+
+        // Keep the template dust active until the leaves have been configured.
+        // Only replace the original menu effect after the clone is ready.
+        if (dustGo) dustGo->active = false;
     }
 
     void DestroyAutumnLeaves() {
-        if(autumnLeavesGo) GameObject::Destroy(autumnLeavesGo->gameObject);
-        // The original menu dust was never disabled by this mod.
+        if (autumnLeavesGo) {
+            GameObject::Destroy(autumnLeavesGo->gameObject);
+            autumnLeavesGo = nullptr;
+        }
+        // Restore the original effect when Halloween leaves are removed.
+        if (dustGo) dustGo->active = true;
     }
 
 }

@@ -44,7 +44,6 @@ namespace Halloween::autumnLeaves {
 
 
         // Create the autumnLeaves GameObject from the dust
-        dustGo->active = false; // Dust and leaves at the same time looks busy, so 
         autumnLeavesGo = GameObject::Instantiate(dustGo->gameObject);
         autumnLeavesGo->name = "AutumnLeavesPS";
         autumnLeavesGo->active = true;
@@ -53,6 +52,12 @@ namespace Halloween::autumnLeaves {
         // Get components from the autumnLeaves
         UnityEngine::ParticleSystem* autumnLeaves = autumnLeavesGo->GetComponent<ParticleSystem*>();
         UnityEngine::ParticleSystemRenderer* particleRenderer = autumnLeavesGo->GetComponent<UnityEngine::ParticleSystemRenderer*>();
+        if (!autumnLeaves || !particleRenderer) {
+            WARNING("Autumn leaves: cloned dust lacks particle system or renderer; removing clone");
+            GameObject::Destroy(autumnLeavesGo->gameObject);
+            autumnLeavesGo = nullptr;
+            return;
+        }
         
         // Set up autumnLeavesGo where it needs to be
         autumnLeavesGo->transform->parent = nullptr;
@@ -99,17 +104,24 @@ ParticleController::ColorBySpeedModule::set_enabled(
         ParticleController::CollisionModule::set_bounce(autumnLeaves, 0.0f);
         ParticleController::CollisionModule::set_lifetimeLoss(autumnLeaves, 0.02);
         const int numLeafSprites = 5;
-        particleRenderer->material->mainTexture = BSML::Utilities::LoadTextureRaw(static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaves_png));
+        auto leafTexture = BSML::Utilities::LoadTextureRaw(static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaves_png));
+        auto leafMaterial = particleRenderer->get_material();
+        if (!leafMaterial || !leafTexture) {
+            WARNING("Autumn leaves: texture or particle material unavailable; removing clone");
+            GameObject::Destroy(autumnLeavesGo->gameObject);
+            autumnLeavesGo = nullptr;
+            return;
+        }
+        leafMaterial->set_mainTexture(leafTexture);
 // Verified Quest fix: Sprites/Default samples the RGBA leaf spritesheet in full color.
 // Do not use Particles/Standard Unlit here: it rendered the leaves white.
 auto leafShader = UnityEngine::Shader::Find("Sprites/Default");
 if (leafShader && particleRenderer) {
-    auto leafMaterial = particleRenderer->get_material();
     if (leafMaterial) {
         leafMaterial->set_shader(leafShader);
         leafMaterial->SetTexture(
             StringW("_MainTex"),
-            BSML::Utilities::LoadTextureRaw(static_cast<ArrayW<uint8_t>>(IncludedAssets::autumn_leaves_png))
+            leafTexture
         );
         leafMaterial->SetColor(StringW("_Color"), UnityEngine::Color(1, 1, 1, 1));
     }
@@ -127,7 +139,7 @@ if (leafShader && particleRenderer) {
 
     void DestroyAutumnLeaves() {
         if(autumnLeavesGo) GameObject::Destroy(autumnLeavesGo->gameObject);
-        if(dustGo) dustGo->active = true;
+        // The original menu dust was never disabled by this mod.
     }
 
 }

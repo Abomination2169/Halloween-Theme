@@ -47,6 +47,14 @@ static void set_##name(UnityEngine::ParticleSystem* particleSystem, type value);
 
 // DECLARE_CLASS_CODEGEN(Flair, ParticleController, UnityEngine::MonoBehaviour,
 namespace Flair {
+    // Track missing Unity internal calls while configuring a replacement
+    // particle system. The original menu dust is retained on failure.
+    namespace ParticleSafety {
+        void Reset();
+        void MarkMissing(const char* callName);
+        bool HadMissingIcall();
+    }
+
 
     class ParticleController {
         public:

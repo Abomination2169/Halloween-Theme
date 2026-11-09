@@ -2,6 +2,7 @@
 #include "AutumnLeaves/particleController.hpp"
 
 #include "UnityEngine/GameObject.hpp"
+#include "logging.hpp"
 
 namespace {
     bool g_missingParticleIcall = false;

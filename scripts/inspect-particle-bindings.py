@@ -67,3 +67,11 @@ for filename, needles in (
     for line in p.read_text(encoding="utf-8").splitlines():
         if any(n in line for n in needles):
             print(line.strip()[:300])
+
+p = Path("extern/includes/bs-cordl/include/UnityEngine/zzzz__ParticleSystem_def.hpp")
+t = p.read_text(encoding="utf-8")
+i = t.find("struct CORDL_TYPE ParticleSystem_Particle")
+if i < 0:
+    i = t.find("struct ParticleSystem_Particle")
+print("--- ParticleSystem_Particle fields ---")
+print(t[i:i+5200])

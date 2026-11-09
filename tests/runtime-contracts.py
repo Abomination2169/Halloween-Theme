@@ -30,6 +30,10 @@ if "system->Stop(true);" not in leaves or "system->Clear(true);" not in leaves o
     raise SystemExit("Leaf clones must clear inherited particles and restart after configuration")
 if "emissionRate._ctor(1.0f)" not in leaves or "mainModule.set_maxParticles(30)" not in leaves:
     raise SystemExit("Five leaf emitters must retain original aggregate emission and particle cap")
+if "UpdateLeafFloor()" not in leaves or "GetParticles(particles)" not in leaves or "SetParticles(particles, count)" not in leaves:
+    raise SystemExit("1.45.3 leaves require a supported floor cutoff")
+if "mainModule.set_simulationSpace(ParticleSystemSimulationSpace::World)" not in leaves:
+    raise SystemExit("Floor cutoff requires world-space particle positions")
 if "ParticleController::MainModule::set_" in leaves or "Flair::ParticleSafety::HadMissingIcall()" in leaves:
     raise SystemExit("Leaves still depend on obsolete manual ICALL setters")
 if leaves.find("dustGo->active = false") < leaves.find("BSML::Utilities::LoadTextureRaw(encodedLeaves[i])"):

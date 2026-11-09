@@ -23,8 +23,10 @@ struct ModConfig {
     HalloweenPortFlag EnableHauntedEnvColors{};
     HalloweenPortFlag EnablePumpkinAccents{};
 
-    static constexpr const char* SettingsPath =
-        "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/settings.cfg";
+#ifndef HALLOWEEN_SETTINGS_PATH
+#define HALLOWEEN_SETTINGS_PATH "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/settings.cfg"
+#endif
+    static constexpr const char* SettingsPath = HALLOWEEN_SETTINGS_PATH;
 
     static bool ParseBool(std::string_view input, bool& output) {
         if (input == "true" || input == "1") { output = true; return true; }

@@ -64,6 +64,9 @@ namespace Halloween::autumnLeaves {
         autumnLeavesGo->transform->position = UnityEngine::Vector3(0.0f, 7.0f, 0.0f);
         autumnLeavesGo->transform->rotation = UnityEngine::Quaternion::Euler(UnityEngine::Vector3(0.0f, 0.0f, 0.0f));
 
+        // Track missing runtime Unity calls so we never suppress the base dust
+        // when the Halloween leaf particle system could not be configured.
+        Flair::ParticleSafety::Reset();
         // Use Flair's ParticleController to modify ParticleSystem properties to warp the dust into autumnLeaves
         ParticleController::MainModule::set_startLifetime(autumnLeaves, 14.0f);
         ParticleController::MainModule::set_startSize(autumnLeaves, 0.18);
@@ -135,6 +138,13 @@ if (leafShader && particleRenderer) {
         ParticleController::TextureSheetAnimationModule::set_frameOverTime(autumnLeaves, ParticleController::MinMaxCurve(0.0f, numLeafSprites));
         ParticleController::TextureSheetAnimationModule::set_startFrame(autumnLeaves, ParticleController::MinMaxCurve(0.0f, numLeafSprites));
         ParticleController::TextureSheetAnimationModule::set_cycleCount(autumnLeaves, 0);
+
+        if (Flair::ParticleSafety::HadMissingIcall()) {
+            WARNING("Autumn leaves: required particle call unavailable; retaining original menu dust");
+            GameObject::Destroy(autumnLeavesGo->gameObject);
+            autumnLeavesGo = nullptr;
+            return;
+        }
 
         // Keep the template dust active until the leaves have been configured.
         // Only replace the original menu effect after the clone is ready.

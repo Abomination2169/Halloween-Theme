@@ -117,3 +117,9 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - [GitHub Actions run 42636062683](https://github.com/Abomination2169/Halloween-Theme/actions/runs/42636062683) passed the generated manifest dependency audit, ARM64 ELF check, QMOD packaging and artifact upload.
 - QPM generated five installable `mod.json` dependencies with downloadIfMissing URLs: `paper2_scotland2` `^4.8.0`; `beatsaber-hook` `^9.3.0` (resolved 9.4.3); `bsml` `^0.6.6`; `custom-types` `^0.21.2`; and `flamingo` `^1.3.1`. The source template's empty dependencies array is populated by `qpm qmod manifest` as intended.
 - The build still applies a temporary upstream beatsaber-hook header diagnostic and settings remain defaults-only. No Quest 3 runtime verification yet. Leave draft PR open and release disabled.
+
+## Upstream compiler compatibility review (2026-11-09)
+
+- Latest published `QuestPackageManager/beatsaber-hook` release remains `v9.4.3` (2026-10-31). The `master` branch still declares the 3-argument `find_method_info` constructor `constexpr` while its `i2c::view` parameters are not literal in the restored header. The exact-match CI-only diagnostic remains necessary for the current toolchain; do not present it as an upstream fix.
+- CI now additionally inspects the **packaged** QMOD manifest for the five runtime dependency IDs and valid HTTPS `downloadIfMissing` URLs, not only the generated intermediate `mod.json`.
+- Persistent settings and Quest runtime behavior remain unverified; draft PR and release safety gate remain in place.

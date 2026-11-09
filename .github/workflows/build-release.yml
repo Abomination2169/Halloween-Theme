@@ -61,8 +61,8 @@ jobs:
           manifest = json.loads(Path("mod.json").read_text(encoding="utf-8"))
           if manifest.get("id") != "halloween":
               raise SystemExit("Unexpected mod id")
-          if manifest.get("packageVersion") != "1.40.8_7379":
-              raise SystemExit("Manifest no longer targets Beat Saber 1.40.8_7379")
+          if manifest.get("packageVersion") != "1.45.3_30054":
+              raise SystemExit("Manifest no longer targets Beat Saber 1.45.3_30054")
           if manifest.get("modFiles") != ["libhalloween.so"]:
               raise SystemExit("Unexpected Halloween library declaration")
           if not Path(manifest["coverImage"]).is_file():
@@ -107,8 +107,8 @@ jobs:
               manifest = json.loads(archive.read("mod.json"))
               if manifest.get("id") != "halloween":
                   raise SystemExit("Unexpected packaged mod id")
-              if manifest.get("packageVersion") != "1.40.8_7379":
-                  raise SystemExit("Packaged manifest no longer targets Beat Saber 1.40.8_7379")
+              if manifest.get("packageVersion") != "1.45.3_30054":
+                  raise SystemExit("Packaged manifest no longer targets Beat Saber 1.45.3_30054")
               if "libhalloween.so" not in names:
                   raise SystemExit("QMOD is missing libhalloween.so")
               cover = manifest.get("coverImage")
@@ -120,13 +120,13 @@ jobs:
                   raise SystemExit(f"Unexpected audio fileCopies: {sorted(actual_audio)}")
               if not expected_audio.issubset(names):
                   raise SystemExit("QMOD is missing Ghostly_Horror_Menu.ogg")
-          print("QMOD validated: 1.40.8 manifest, library, cover, and menu audio.")
+          print("QMOD validated: 1.45.3 manifest, library, cover, and menu audio.")
           PY
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Halloween-QMOD
+          name: Halloween-1453-QMOD
           path: Halloween-Theme.qmod
           if-no-files-found: error
 
@@ -146,7 +146,7 @@ jobs:
       - name: Download QMOD artifact
         uses: actions/download-artifact@v4
         with:
-          name: Halloween-QMOD
+          name: Halloween-1453-QMOD
           path: dist
 
       - name: Validate release tag against packaged manifest

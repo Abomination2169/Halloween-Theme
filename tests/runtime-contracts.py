@@ -18,12 +18,16 @@ for term in ("ParticleSafety::MarkMissing", "ParticleSafety::HadMissingIcall",
              "if (!SetterFunc || !particleSystem)", "if (!Func || !particleSystem)"):
     if term not in particle and term != "ParticleSafety::HadMissingIcall":
         raise SystemExit(f"Particle guards missing: {term}")
-if "auto mainModule = autumnLeaves->main;" not in leaves or "emission.set_rateOverTime(emissionRate);" not in leaves:
-    raise SystemExit("Leaves must use generated Unity particle bindings")
+if "atlas->GetPixels(left, 0, width, atlasHeight)" not in leaves or "tile->SetPixels(pixels)" not in leaves:
+    raise SystemExit("Leaf atlas must be cropped into individual textures")
+if "LeafVariants = 5" not in leaves or "emission.set_rateOverTime(emissionRate);" not in leaves:
+    raise SystemExit("Five-emitter leaf replacement configuration missing")
 if "ParticleController::MainModule::set_" in leaves or "Flair::ParticleSafety::HadMissingIcall()" in leaves:
     raise SystemExit("Leaves still depend on obsolete manual ICALL setters")
-if leaves.find("dustGo->active = false") < leaves.find("emission.set_rateOverTime(emissionRate)"):
-    raise SystemExit("Original menu dust disabled before leaf configuration")
+if leaves.find("dustGo->active = false") < leaves.find("tile->SetPixels(pixels)"):
+    raise SystemExit("Original menu dust disabled before leaf texture creation")
+if "RemoveLeafClones();" not in leaves or "if (dustGo) dustGo->active = true;" not in leaves:
+    raise SystemExit("Missing rollback for failed leaf initialization")
 
 if "safe_ptr<GlobalNamespace::SongPreviewPlayer*>" not in audio or "safe_ptr<decltype(loadTask)>" not in audio:
     raise SystemExit("Asynchronous audio references are no longer held safely")

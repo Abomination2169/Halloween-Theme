@@ -61,6 +61,9 @@ jobs:
       - name: Restore QPM dependencies
         run: qpm restore
 
+      - name: Inspect generated Unity ParticleSystem API for migration
+        run: python3 scripts/inspect-particle-bindings.py
+
       - name: Diagnose upstream beatsaber-hook constexpr constructor (temporary)
         run: python3 scripts/diagnose-hook-constexpr.py
 

@@ -75,3 +75,9 @@ if i < 0:
     i = t.find("struct ParticleSystem_Particle")
 print("--- ParticleSystem_Particle fields ---")
 print(t[i:i+5200])
+
+print("--- ParticleSystem Emit overloads ---")
+p = Path("extern/includes/bs-cordl/include/UnityEngine/zzzz__ParticleSystem_def.hpp")
+for line in p.read_text(encoding="utf-8").splitlines():
+    if " Emit(" in line or " Play(" in line:
+        print(line.strip()[:300])

@@ -111,3 +111,9 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - CI now prints and validates generated `mod.json` dependency IDs after `qpm qmod manifest`. Required IDs: `beatsaber-hook`, `bsml`, `custom-types`, `paper2_scotland2`, `flamingo`.
 - This check deliberately runs **after** QPM manifest generation and fails closed if required dependencies are absent. It does not assume that linking the `.so` automatically populates the QMOD dependency manifest.
 - Confirm the next CI result before treating the package as installable. Do not merge or release the draft port.
+
+## Runtime dependency audit: PASS (2026-11-09)
+
+- [GitHub Actions run 42636062683](https://github.com/Abomination2169/Halloween-Theme/actions/runs/42636062683) passed the generated manifest dependency audit, ARM64 ELF check, QMOD packaging and artifact upload.
+- QPM generated five installable `mod.json` dependencies with downloadIfMissing URLs: `paper2_scotland2` `^4.8.0`; `beatsaber-hook` `^9.3.0` (resolved 9.4.3); `bsml` `^0.6.6`; `custom-types` `^0.21.2`; and `flamingo` `^1.3.1`. The source template's empty dependencies array is populated by `qpm qmod manifest` as intended.
+- The build still applies a temporary upstream beatsaber-hook header diagnostic and settings remain defaults-only. No Quest 3 runtime verification yet. Leave draft PR open and release disabled.

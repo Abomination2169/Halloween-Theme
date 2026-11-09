@@ -18,7 +18,7 @@ assert manifest["packageVersion"] == "1.40.8_7379"
 assert qpm["info"]["additionalData"]["overrideSoName"] == "libhalloween.so"
 assert (root / manifest["coverImage"]).is_file()
 assert "modconfig.hpp" in main_header
-assert re.search(r"DECLARE_CONFIG\\(ModConfig\\)\\s*\\{", config)
+assert "DECLARE_CONFIG(ModConfig) {" in config
 assert "getModConfig().Init(modInfo)" in source
 # Remove C++ line and block comments before scanning active config references.
 # This avoids requiring settings referenced only in disabled legacy hooks.

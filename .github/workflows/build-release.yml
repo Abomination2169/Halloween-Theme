@@ -107,6 +107,11 @@ jobs:
           print("Halloween manifest and source assets validated.")
           PY
 
+      - name: Generate five transparent leaf textures from original atlas
+        run: |
+          python3 -m pip install --break-system-packages Pillow
+          python3 scripts/split-leaf-atlas.py
+
       - name: Configure Android build
         run: |
           NDK_TOOLCHAIN="$(find "$HOME/.local/share/QPM-RS/ndk" -path '*/build/cmake/android.toolchain.cmake' -print -quit)"

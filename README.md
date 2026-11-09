@@ -13,7 +13,9 @@ Based on the fantastic Christmas Mod by Vcmikuu and CatsaCode. Free music provid
 
 Note: Development assisted with use of A.I. Please support talented artists and coders whenever possible.
 
-**Compatible with:** Beat Saber 1.40.8 (Quest)
+**1.45.3 development port (this branch):** Beat Saber **1.45.3_30054**, Quest 3; **NOT yet headset-tested**. The generated QMOD is a test artifact, not a published release. See [INSTALLATION-1.45.3.md](INSTALLATION-1.45.3.md) and [TESTING-1.45.3.md](TESTING-1.45.3.md) for safety gates and checks.
+
+**Stable published release:** Halloween v1.0.0 for Beat Saber **1.40.8** remains on the production `main` branch and existing [releases page](https://github.com/Abomination2169/Halloween-Theme/releases/tag/v1.0.0); do not replace it with this port while using 1.40.8.
 
 ## License and source code
 

@@ -181,8 +181,9 @@ namespace Halloween::logoColors { void ApplyLogoColors(); }
 MAKE_HOOK_MATCH(AutumnLeavesInit, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     AutumnLeavesInit(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-    if(!firstActivation) return;
-
+    // Reapply on return to the main menu as well as on first launch.
+    // The leaves and pumpkin creators are idempotent, and Unity may destroy
+    // their scene-owned objects while a song is active.
     Halloween::logoColors::ApplyLogoColors();
 
     

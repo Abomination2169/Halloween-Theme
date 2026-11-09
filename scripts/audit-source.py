@@ -20,7 +20,11 @@ assert (root / manifest["coverImage"]).is_file()
 assert "modconfig.hpp" in main_header
 assert "DECLARE_CONFIG(ModConfig" in config
 assert "getModConfig().Init(modInfo)" in source
-for name in set(re.findall(r"getModConfig\(\)\.(\w+)\.GetValue\(\)", source)):
+# Remove C++ line and block comments before scanning active config references.
+# This avoids requiring settings referenced only in disabled legacy hooks.
+active_source = re.sub(r"/\\*[\\s\\S]*?\\*/", "", source)
+active_source = re.sub(r"//[^\\n]*", "", active_source)
+for name in set(re.findall(r"getModConfig\\(\\)\\.(\\w+)\\.GetValue\\(\\)", active_source)):
     assert re.search(r"CONFIG_VALUE\(\s*" + re.escape(name) + r"\s*,", config), (
         f"Config value {name} used but not declared"
     )

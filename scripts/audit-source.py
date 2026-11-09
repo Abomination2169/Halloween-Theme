@@ -28,11 +28,11 @@ def uncomment(text):
 active_source = uncomment(source)
 active_config = uncomment(config)
 for name in set(re.findall(r"getModConfig\(\)\.(\w+)\.GetValue\(\)", active_source)):
-    assert re.search(r"CONFIG_VALUE\(\s*" + re.escape(name) + r"\s*,", active_config), (
+    assert re.search(r"HalloweenPortFlag\s+" + re.escape(name) + r"\s*\{", active_config), (
         f"Active config value {name} is not declared in c.hpp"
     )
 
 for entry in manifest["fileCopies"]:
     assert (root / "FileCopies" / Path(entry["name"]).name).is_file()
 assert "packageVersion" in workflow and "Halloween-Theme.qmod" in workflow
-print("PASS: existing config, 1.40.8 metadata, and required packaging assets")
+print("PASS: port config, 1.45.3 metadata, and required packaging assets")

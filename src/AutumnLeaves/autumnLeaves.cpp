@@ -6,6 +6,7 @@
 
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/Transform.hpp"
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/ParticleSystem.hpp"
 #include "UnityEngine/ParticleSystemRenderer.hpp"

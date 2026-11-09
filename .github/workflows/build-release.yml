@@ -49,6 +49,9 @@ jobs:
       - name: Restore QPM dependencies
         run: qpm restore
 
+      - name: Diagnose upstream beatsaber-hook constexpr constructor (temporary)
+        run: python3 scripts/diagnose-hook-constexpr.py
+
       - name: Generate QMOD manifest
         run: qpm qmod manifest
 

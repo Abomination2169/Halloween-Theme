@@ -15,6 +15,7 @@
 #include "UnityEngine/Material.hpp"
 #include "UnityEngine/Shader.hpp"
 #include "UnityEngine/Color.hpp"
+#include "UnityEngine/Time.hpp"
 #include "bsml/shared/Helpers/utilities.hpp"
 
 #include <array>
@@ -27,6 +28,8 @@ namespace Halloween::autumnLeaves {
         constexpr int LeafVariants = 5;
         std::array<safe_ptr<GameObject*>, LeafVariants> leafObjects{};
         safe_ptr<GameObject*> dustGo;
+        float emissionAccumulator = 0.0f;
+        int nextLeafVariant = 0;
 
         void RemoveLeafClones() {
             for (auto& leaf : leafObjects) {
@@ -40,6 +43,8 @@ namespace Halloween::autumnLeaves {
 
     void CreateAutumnLeaves() {
         if (leafObjects[0]) return;
+        emissionAccumulator = 0.0f;
+        nextLeafVariant = 0;
 
         // Find the original menu dust emitter, which supplies working motion
         // and geometry on Beat Saber 1.45.3.
@@ -135,8 +140,12 @@ namespace Halloween::autumnLeaves {
                 system->Clear(true);
 
                 auto emission = system->emission;
-                emission.set_enabled(true);
+                // Disable the DustPS automatic rate and any inherited bursts.
+                // UpdateLeafFloor emits exactly five leaves per second across
+                // all five variants, preserving the original single-emitter
+                // cadence rather than multiplying inherited dust emissions.
                 emission.set_rateOverTime(emissionRate);
+                emission.set_enabled(false);
                 auto shape = system->shape;
                 shape.set_rotation(Vector3(0, 0, 0));
             }
@@ -160,12 +169,30 @@ namespace Halloween::autumnLeaves {
     }
 
     void UpdateLeafFloor() {
-        // CollisionModule setters were stripped in Beat Saber 1.45.3.
-        // Instead, remove particles only when they reach the menu floor.
-        // This is a visual floor cutoff, not a replacement for physics bounce.
-        // Check every third menu frame to limit managed-array allocations.
+        if (!leafObjects[0]) return;
+
+        // The original 1.40.8 emitter produces five leaves per second.
+        // One shared clock and round-robin selection reproduce that timing
+        // without allowing five cloned DustPS burst schedules to stack.
+        emissionAccumulator += Time::get_deltaTime() * 5.0f;
+        int emittedThisFrame = 0;
+        while (emissionAccumulator >= 1.0f && emittedThisFrame < 3) {
+            auto& leaf = leafObjects[nextLeafVariant];
+            if (leaf) {
+                auto system = leaf->GetComponent<ParticleSystem*>();
+                if (system) system->Emit(1);
+            }
+            nextLeafVariant = (nextLeafVariant + 1) % LeafVariants;
+            emissionAccumulator -= 1.0f;
+            ++emittedThisFrame;
+        }
+        // Prevent a paused menu from accumulating an emission backlog.
+        if (emissionAccumulator > 3.0f) emissionAccumulator = 0.0f;
+
+        // 1.45.3 lacks CollisionModule setters. Remove particles crossing
+        // the menu floor; this is a floor cutoff, not physical bouncing.
         static int frameCounter = 0;
-        if (++frameCounter % 3 != 0 || !leafObjects[0]) return;
+        if (++frameCounter % 3 != 0) return;
 
         constexpr float FloorY = 0.0f;
         constexpr int MaxPerEmitter = 30;
@@ -188,6 +215,8 @@ namespace Halloween::autumnLeaves {
     }
 
     void DestroyAutumnLeaves() {
+        emissionAccumulator = 0.0f;
+        nextLeafVariant = 0;
         RemoveLeafClones();
         if (dustGo) dustGo->active = true;
     }

@@ -113,3 +113,21 @@ for filename in (
         for line in p.read_text(encoding="utf-8").splitlines():
             if any(term in line for term in ("FindMethod", "RunMethod", "FindClass", "GetMethod", "resolve_icall")):
                 print(filename, line.strip()[:260])
+
+print("--- EmitParams structure and supported setters for original box spawning ---")
+p = Path("extern/includes/bs-cordl/include/UnityEngine/zzzz__ParticleSystem_def.hpp")
+source = p.read_text(encoding="utf-8")
+for marker in ("struct CORDL_TYPE ParticleSystem_EmitParams", "struct ParticleSystem_EmitParams"):
+    start = source.find(marker)
+    if start >= 0:
+        end = source.find("\n};", start)
+        print(source[start:end + 3 if end >= 0 else start + 7500][:11000])
+        break
+else:
+    print("EmitParams declaration not found in ParticleSystem_def.hpp")
+for name in ("UnityEngine/zzzz__ParticleSystem_EmitParams_def.hpp", "UnityEngine/zzzz__ParticleSystem_EmitParams.hpp"):
+    p = Path("extern/includes/bs-cordl/include") / name
+    if p.exists():
+        print(name)
+        print("\n".join(x[:260] for x in p.read_text(encoding="utf-8").splitlines()
+                        if any(n in x for n in ("position", "velocity", "startLifetime", "startSize", "randomSeed", "applyShapeToPosition"))))

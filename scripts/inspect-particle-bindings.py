@@ -24,3 +24,16 @@ for name in ("ParticleSystem_MainModule", "ParticleSystem_EmissionModule",
     print(f"--- {name}: {len(matches)} matching declarations ---")
     for line in matches[:110]:
         print(line[:250])
+
+print("--- Texture2D and Material API ---")
+for filename, needles in (
+    ("UnityEngine/zzzz__Texture2D_def.hpp", ("GetPixels", "SetPixels", "Apply", "get_width", "get_height", "New_ctor", "get_isReadable")),
+    ("UnityEngine/zzzz__Material_def.hpp", ("SetTextureOffset", "SetTextureScale", "set_mainTextureOffset", "set_mainTextureScale")),
+):
+    p = Path("extern/includes/bs-cordl/include") / filename
+    if not p.exists():
+        print("MISSING", p)
+        continue
+    for line in p.read_text(encoding="utf-8").splitlines():
+        if line.strip().startswith(("inline", "static inline")) and any(x in line for x in needles):
+            print(line.strip()[:300])

@@ -1,6 +1,6 @@
 # Halloween Theme 1.45.3 — pre-release and Quest 3 validation
 
-**Status:** CI produced a QMOD for Beat Saber `1.45.3_30054` (run [42634367459](https://github.com/Abomination2169/Halloween-Theme/actions/runs/42634367459)). **This is a development artifact, not a tested release.**
+**Status:** CI produces a 1.45.3_30054 development QMOD and host-side configuration tests now pass. **No on-device validation has been performed.** Follow [INSTALLATION-1.45.3.md](INSTALLATION-1.45.3.md) for version checks, staged installation, smoke tests, and rollback precautions.
 
 ## Preserve the known-good installation
 
@@ -13,10 +13,10 @@
 
 1. Require a green CI run that validates the ELF architecture, dynamic dependencies, QMOD manifest, embedded artwork, and audio asset.
 2. Review the **temporary** `scripts/diagnose-hook-constexpr.py` patch: it alters a downloaded beatsaber-hook header during CI. Replace with a supported upstream fix before publishing.
-3. Replace the `include/c.hpp` defaults-only shim with a compatible settings implementation; it currently does **not** persist enable/disable choices.
-4. Review all `i2c::resolve_icall(...).value()` particle-system calls against Unity's 1.45.3 runtime: a missing or changed internal call can fail at runtime despite successful compilation.
+3. The standalone `include/c.hpp` now persists four feature flags. Host-side save/reload tests pass, but verify actual Quest filesystem access and settings persistence before release.
+4. The particle ICALL wrappers now use guarded resolution and report missing calls. Missing required setters prevent deactivating base dust; confirm this fallback and the correct leaf appearance during Quest testing.
 5. Review the `safe_ptr<GameObject*>` ownership and destruction paths for the pumpkins and leaves, including reentering the main menu.
-6. Check that Flamingo is installed/resolved as a runtime dependency, not merely linked at build time.
+6. All five runtime dependency QMOD assets have been checked against published GitHub releases; confirm they install/resolve correctly on the test headset, particularly Flamingo.
 
 ## On-device smoke test — only when ready to migrate
 

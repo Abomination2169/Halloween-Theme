@@ -130,3 +130,9 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - Supported keys: `EnableMenuMusic`, `EnableAutumnLeaves`, `EnableHauntedEnvColors`, `EnablePumpkinAccents`; values `true`/`false` or `1`/`0`. Unknown keys and malformed values are ignored, retaining safe defaults.
 - Saving uses a temporary file and filesystem rename. Read/write exceptions are caught during `Init()` because the mod's `setup()` entry point is `noexcept`. Configuration persistence is **not** yet Quest-tested.
 - This change does **not** add in-game settings UI or live toggle behavior. To change a setting manually, edit the file and restart Beat Saber. The configuration is not shared with the production 1.40.8 source; the 1.45.3 port must not be installed over the stable headset setup yet.
+
+## Persistent settings automated smoke tests
+
+- Added `tests/settings-smoke.cpp` to exercise first-run file creation, save/reload of disabled features, invalid and unknown settings, and non-destructive handling of malformed files.
+- The production Android settings path is unchanged; `HALLOWEEN_SETTINGS_PATH` is overridable only for isolated host testing. GitHub Actions compiles and runs the same `include/c.hpp` implementation using a temporary Linux file path before Android build.
+- This is host-side validation, **not** proof that Quest 3 storage permissions or the in-game effects behave correctly. Keep the draft PR and release gate in place.

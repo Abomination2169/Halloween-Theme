@@ -91,3 +91,11 @@ The staged metadata and CI target changes do not modify the Halloween runtime so
 - Linking `libhalloween.so` failed on `flamingo::Install(flamingo::HookInfo&&)`. The link command did not include `libflamingo.so`, even though the restored beatsaber-hook headers refer to Flamingo.
 - Added a direct `flamingo` QPM dependency `^1.3.1` on the **port branch only** so the generated QPM link configuration includes its library (to be confirmed in the next CI run).
 - A successful link is not proof of runtime compatibility; the guarded upstream-header diagnostic, configuration shim, and Quest runtime behavior still require validation before installation.
+
+## First successful CI package — run 42634367459 (2026-11-09)
+
+- Build workflow completed **successfully** at commit `48cffed78d09f45dc38d5fdcf4f12b1987c61aaf`.
+- QPM restore, CI-only beatsaber-hook constexpr diagnostic, 1.45.3 manifest, all 7 C++ translation units, ARM64 shared-library link, QMOD zip generation, asset verification and upload-artifact checks passed.
+- Artifact: [Halloween-1453-QMOD](https://github.com/Abomination2169/Halloween-Theme/actions/runs/42634367459/artifacts/13680994498), ~5.6 MB as uploaded ZIP; contains `Halloween-Theme.qmod`.
+- Linker fix: adding explicit `flamingo ^1.3.1` QPM dependency resolved `flamingo::Install(flamingo::HookInfo&&)`.
+- **NOT release-ready**: no Quest headset runtime test; temporary header diagnostic edits downloaded dependency headers in CI; port config shim does not persist settings; need inspect runtime hook ABI and particle ICALL safety/appearance. Keep draft PR unmerged and preserve production `main` plus v1.0.0 release.

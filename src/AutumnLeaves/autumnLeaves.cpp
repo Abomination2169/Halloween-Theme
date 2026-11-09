@@ -201,7 +201,7 @@ namespace Halloween::autumnLeaves {
 
         // Cut off below-floor particles on every frame rather than every third
         // frame. This remains a cutoff, not Unity world collision.
-        constexpr float FloorY = 0.0f;
+        constexpr float FloorY = 0.5f; // experimental visual cutoff, not physical collision
         constexpr int MaxPerEmitter = 30;
         for (auto& leaf : leafObjects) {
             if (!leaf) continue;
@@ -212,6 +212,13 @@ namespace Halloween::autumnLeaves {
             int count = system->GetParticles(particles);
             bool changed = false;
             for (int j = 0; j < count; ++j) {
+                // DustPS may inherit particle alpha fading despite white start color.
+                // Keep the original leaf artwork alpha, but prevent inherited
+                // per-particle tint from making the whole leaf translucent.
+                if (particles[j].m_StartColor.a != 255) {
+                    particles[j].m_StartColor.a = 255;
+                    changed = true;
+                }
                 if (particles[j].m_Position.y < FloorY) {
                     particles[j].set_remainingLifetime(0.0f);
                     ++diagnosticsFloorRemoved;

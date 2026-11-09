@@ -90,6 +90,28 @@ jobs:
           cmake --build build --parallel
           test -s build/libhalloween.so
 
+      - name: Inspect ARM64 library and Flamingo runtime dependency
+        run: |
+          python3 - <<'PY'
+          import os
+          import subprocess
+          from pathlib import Path
+
+          binary = Path("build/libhalloween.so")
+          ndk = Path(os.environ["ANDROID_NDK_HOME"])
+          readers = list(ndk.glob("toolchains/llvm/prebuilt/*/bin/llvm-readelf"))
+          if len(readers) != 1:
+              raise SystemExit(f"Expected one NDK llvm-readelf, found {len(readers)}")
+          header = subprocess.check_output([str(readers[0]), "-h", str(binary)], text=True)
+          dynamic = subprocess.check_output([str(readers[0]), "-d", str(binary)], text=True)
+          if "AArch64" not in header or "DYN (Shared object file)" not in header:
+              raise SystemExit("Halloween output is not an AArch64 shared library")
+          if "libflamingo.so" not in dynamic:
+              raise SystemExit("Halloween output does not declare libflamingo.so as a runtime dependency")
+          print("Validated: AArch64 shared library with Flamingo runtime dependency")
+          print("\n".join(line.strip() for line in dynamic.splitlines() if "(NEEDED)" in line))
+          PY
+
       - name: Build and package QMOD
         run: |
           qpm qmod zip --import mod.json --skip_build

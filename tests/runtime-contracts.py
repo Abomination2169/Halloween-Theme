@@ -18,28 +18,40 @@ for term in ("ParticleSafety::MarkMissing", "ParticleSafety::HadMissingIcall",
              "if (!SetterFunc || !particleSystem)", "if (!Func || !particleSystem)"):
     if term not in particle and term != "ParticleSafety::HadMissingIcall":
         raise SystemExit(f"Particle guards missing: {term}")
-if "BSML::Utilities::LoadTextureRaw(encodedLeaves[i])" not in leaves:
-    raise SystemExit("Individual leaves must be decoded via BSML")
-if "GetPixels(" in leaves or "SetPixels(" in leaves:
-    raise SystemExit("Runtime pixel copy path causes white leaf cubes")
-if "scripts/split-leaf-atlas.py" not in workflow:
-    raise SystemExit("Build must split atlas into standalone PNGs")
-if "LeafVariants = 5" not in leaves or "emission.set_rateOverTime(emissionRate);" not in leaves:
-    raise SystemExit("Five-emitter leaf replacement configuration missing")
-if "system->Stop(true);" not in leaves or "system->Clear(true);" not in leaves or "system->Play();" not in leaves:
-    raise SystemExit("Leaf clones must clear inherited particles and restart after configuration")
-if "emissionRate._ctor(1.0f)" not in leaves or "mainModule.set_maxParticles(30)" not in leaves:
-    raise SystemExit("Five leaf emitters must retain original aggregate emission and particle cap")
-if "UpdateLeafFloor()" not in leaves or "GetParticles(particles)" not in leaves or "SetParticles(particles, count)" not in leaves:
-    raise SystemExit("1.45.3 leaves require a supported floor cutoff")
-if "mainModule.set_simulationSpace(ParticleSystemSimulationSpace::World)" not in leaves:
-    raise SystemExit("Floor cutoff requires world-space particle positions")
-if "ParticleController::MainModule::set_" in leaves or "Flair::ParticleSafety::HadMissingIcall()" in leaves:
-    raise SystemExit("Leaves still depend on obsolete manual ICALL setters")
-if leaves.find("dustGo->active = false") < leaves.find("BSML::Utilities::LoadTextureRaw(encodedLeaves[i])"):
-    raise SystemExit("Original menu dust disabled before leaf texture creation")
-if "RemoveLeafClones();" not in leaves or "if (dustGo) dustGo->active = true;" not in leaves:
-    raise SystemExit("Missing rollback for failed leaf initialization")
+# The original 1.40.8 design uses exactly one DustPS clone and its
+# five-column texture atlas. Never regress to the five-emitter workaround.
+for term in (
+    'safe_ptr<GameObject*> autumnLeavesGo',
+    'GameObject::Instantiate(dustGo->gameObject)',
+    'IncludedAssets::autumn_leaves_png',
+    'ParticleController::EmissionModule::set_rateOverTime(system, 5.0f)',
+    'mainModule.set_maxParticles(150)',
+    'lifetime._ctor(14.0f)',
+    'mainModule.set_startSizeMultiplier(0.18f)',
+    'mainModule.set_gravityModifierMultiplier(0.025f)',
+    'ParticleController::ShapeType::Box',
+    'Vector3(20, 1, 20)',
+    'ParticleController::ColorOverLifetimeModule::set_enabled(system, false)',
+    'ParticleController::ColorBySpeedModule::set_enabled(system, false)',
+    'ParticleController::CollisionModule::set_enabled(system, true)',
+    'ParticleController::TextureSheetAnimationModule::set_enabled(system, true)',
+    'ParticleController::TextureSheetAnimationModule::set_numTilesX(system, numLeafSprites)',
+    'ParticleController::TextureSheetAnimationModule::set_numTilesY(system, 1)',
+    'void UpdateLeafFloor() {}',
+):
+    if term not in leaves:
+        raise SystemExit(f"Original single-emitter behavior missing: {term}")
+for forbidden in ('LeafVariants = 5', 'leafObjects', 'emissionAccumulator',
+                  'system->Emit(1)', 'set_remainingLifetime(0.0f)',
+                  'IncludedAssets::autumn_leaf_0_png'):
+    if forbidden in leaves:
+        raise SystemExit(f"Five-emitter workaround still present: {forbidden}")
+if leaves.count('GameObject::Instantiate(dustGo->gameObject)') != 1:
+    raise SystemExit("Expected exactly one original DustPS clone")
+if leaves.find('dustGo->active = false') < leaves.find('IncludedAssets::autumn_leaves_png'):
+    raise SystemExit("Original dust disabled before atlas was loaded")
+if "if (dustGo) dustGo->active = true;" not in leaves:
+    raise SystemExit("Original dust restoration missing")
 
 if "safe_ptr<GlobalNamespace::SongPreviewPlayer*>" not in audio or "safe_ptr<decltype(loadTask)>" not in audio:
     raise SystemExit("Asynchronous audio references are no longer held safely")

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'test/1453-restore-leaf-collision-density'
     tags:
       - "v*"
   pull_request:

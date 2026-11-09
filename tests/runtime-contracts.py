@@ -18,11 +18,11 @@ for term in ("ParticleSafety::MarkMissing", "ParticleSafety::HadMissingIcall",
              "if (!SetterFunc || !particleSystem)", "if (!Func || !particleSystem)"):
     if term not in particle and term != "ParticleSafety::HadMissingIcall":
         raise SystemExit(f"Particle guards missing: {term}")
-if "auto mainModule = autumnLeaves->main;" not in leaves or "auto textureSheet = autumnLeaves->textureSheetAnimation;" not in leaves:
+if "auto mainModule = autumnLeaves->main;" not in leaves or "emission.set_rateOverTime(emissionRate);" not in leaves:
     raise SystemExit("Leaves must use generated Unity particle bindings")
 if "ParticleController::MainModule::set_" in leaves or "Flair::ParticleSafety::HadMissingIcall()" in leaves:
     raise SystemExit("Leaves still depend on obsolete manual ICALL setters")
-if leaves.find("dustGo->active = false") < leaves.find("textureSheet.set_cycleCount(0)"):
+if leaves.find("dustGo->active = false") < leaves.find("emission.set_rateOverTime(emissionRate)"):
     raise SystemExit("Original menu dust disabled before leaf configuration")
 
 if "safe_ptr<GlobalNamespace::SongPreviewPlayer*>" not in audio or "safe_ptr<decltype(loadTask)>" not in audio:

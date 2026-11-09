@@ -68,6 +68,7 @@ namespace Halloween::autumnLeaves {
         autumnLeavesGo->transform->position = UnityEngine::Vector3(0.0f, 7.0f, 0.0f);
         autumnLeavesGo->transform->rotation = UnityEngine::Quaternion::Euler(UnityEngine::Vector3(0.0f, 0.0f, 0.0f));
 
+        // 1.45.3 headset log confirms the legacy _Injected lookups all failed.
         // Use the generated Unity bindings rather than obsolete manually-resolved
         // ParticleSystem module internal calls. These are versioned with the game.
         auto mainModule = autumnLeaves->main;

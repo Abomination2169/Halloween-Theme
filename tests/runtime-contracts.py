@@ -18,13 +18,17 @@ for term in ("ParticleSafety::MarkMissing", "ParticleSafety::HadMissingIcall",
              "if (!SetterFunc || !particleSystem)", "if (!Func || !particleSystem)"):
     if term not in particle and term != "ParticleSafety::HadMissingIcall":
         raise SystemExit(f"Particle guards missing: {term}")
-if "atlas->GetPixels(left, 0, width, atlasHeight)" not in leaves or "tile->SetPixels(pixels)" not in leaves:
-    raise SystemExit("Leaf atlas must be cropped into individual textures")
+if "BSML::Utilities::LoadTextureRaw(encodedLeaves[i])" not in leaves:
+    raise SystemExit("Individual leaves must be decoded via BSML")
+if "GetPixels(" in leaves or "SetPixels(" in leaves:
+    raise SystemExit("Runtime pixel copy path causes white leaf cubes")
+if "scripts/split-leaf-atlas.py" not in workflow:
+    raise SystemExit("Build must split atlas into standalone PNGs")
 if "LeafVariants = 5" not in leaves or "emission.set_rateOverTime(emissionRate);" not in leaves:
     raise SystemExit("Five-emitter leaf replacement configuration missing")
 if "ParticleController::MainModule::set_" in leaves or "Flair::ParticleSafety::HadMissingIcall()" in leaves:
     raise SystemExit("Leaves still depend on obsolete manual ICALL setters")
-if leaves.find("dustGo->active = false") < leaves.find("tile->SetPixels(pixels)"):
+if leaves.find("dustGo->active = false") < leaves.find("BSML::Utilities::LoadTextureRaw(encodedLeaves[i])"):
     raise SystemExit("Original menu dust disabled before leaf texture creation")
 if "RemoveLeafClones();" not in leaves or "if (dustGo) dustGo->active = true;" not in leaves:
     raise SystemExit("Missing rollback for failed leaf initialization")

@@ -245,7 +245,7 @@ namespace Halloween::autumnLeaves {
                  diagnosticsElapsed, diagnosticsEmitted, alive, 0);
             diagnosticsElapsed = 0.0f;
             diagnosticsEmitted = 0;
-            diagnosticsFloorRemoved = 0;
+
         }
 
 

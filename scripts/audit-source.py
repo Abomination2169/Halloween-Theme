@@ -20,15 +20,15 @@ assert '#include "c.hpp"' in source
 assert "DECLARE_CONFIG(ModConfig)" in config
 assert "getModConfig().Init(modInfo)" in source
 
-# Ignore comments when checking config values referenced by live code.
+# Ignore commented-out legacy hooks and declarations.
 def uncomment(text):
-    text = re.sub(r"/\\*.*?\\*/", "", text, flags=re.DOTALL)
-    return re.sub(r"//[^\\n]*", "", text)
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL)
+    return re.sub(r"//[^\n]*", "", text)
 
 active_source = uncomment(source)
 active_config = uncomment(config)
-for name in set(re.findall(r"getModConfig\\(\\)\\.(\\w+)\\.GetValue\\(\\)", active_source)):
-    assert re.search(r"CONFIG_VALUE\\(\\s*" + re.escape(name) + r"\\s*,", active_config), (
+for name in set(re.findall(r"getModConfig\(\)\.(\w+)\.GetValue\(\)", active_source)):
+    assert re.search(r"CONFIG_VALUE\(\s*" + re.escape(name) + r"\s*,", active_config), (
         f"Active config value {name} is not declared in c.hpp"
     )
 

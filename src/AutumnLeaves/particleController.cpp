@@ -20,7 +20,7 @@ namespace Flair::ParticleSafety {
 #define DEFINE_FIELD_SETGET_DIRECT(moduleType, moduleName, propertyType, propertyName) \
 propertyType Flair::ParticleController::moduleType::get_##propertyName(UnityEngine::ParticleSystem* particleSystem) { \
     static auto GetterFunc = i2c::resolve_icall<propertyType, UnityEngine::ParticleSystem::moduleType*>("UnityEngine.ParticleSystem/" #moduleType "::get_" #propertyName "_Injected").value_or(nullptr); \
-    if (!GetterFunc || !particleSystem) return propertyType{}; \
+    if (!GetterFunc || !particleSystem) return {}; \
     UnityEngine::ParticleSystem::moduleType moduleObj = particleSystem->moduleName; \
     return GetterFunc(&moduleObj); \
 } \
@@ -35,7 +35,7 @@ void Flair::ParticleController::moduleType::set_##propertyName(UnityEngine::Part
 #define DEFINE_FIELD_SETGET_BY_REF(moduleType, moduleName, propertyType, propertyName) \
 propertyType Flair::ParticleController::moduleType::get_##propertyName(UnityEngine::ParticleSystem *particleSystem) { \
     static auto GetterFunc = i2c::resolve_icall<void, UnityEngine::ParticleSystem::moduleType*, propertyType*>("UnityEngine.ParticleSystem/" #moduleType "::get_" #propertyName "_Injected").value_or(nullptr); \
-    if (!GetterFunc || !particleSystem) return propertyType{}; \
+    if (!GetterFunc || !particleSystem) return {}; \
     UnityEngine::ParticleSystem::moduleType moduleObj = particleSystem->moduleName; \
     propertyType propertyObj; \
     GetterFunc(&moduleObj, &propertyObj); \
@@ -75,7 +75,7 @@ void Flair::ParticleController::moduleType::funcName(UnityEngine::ParticleSystem
 #define DEFINE_RETURN_0(returnType, moduleType, moduleName, funcName) \
 returnType Flair::ParticleController::moduleType::funcName(UnityEngine::ParticleSystem* particleSystem) { \
     static auto Func = i2c::resolve_icall<returnType, UnityEngine::ParticleSystem::moduleType*>("UnityEngine.ParticleSystem/" #moduleType "::" #funcName "_Injected").value_or(nullptr); \
-    if (!Func || !particleSystem) return returnType{}; \
+    if (!Func || !particleSystem) return {}; \
     UnityEngine::ParticleSystem::moduleType moduleObj = particleSystem->moduleName; \
     return Func(&moduleObj); \
 }
@@ -83,7 +83,7 @@ returnType Flair::ParticleController::moduleType::funcName(UnityEngine::Particle
 #define DEFINE_RETURN_1(returnType, moduleType, moduleName, funcName, para1Type, para1Name) \
 returnType Flair::ParticleController::moduleType::funcName(UnityEngine::ParticleSystem* particleSystem, para1Type para1Name) { \
     static auto Func = i2c::resolve_icall<returnType, UnityEngine::ParticleSystem::moduleType*, para1Type>("UnityEngine.ParticleSystem/" #moduleType "::" #funcName "_Injected").value_or(nullptr); \
-    if (!Func || !particleSystem) return returnType{}; \
+    if (!Func || !particleSystem) return {}; \
     UnityEngine::ParticleSystem::moduleType moduleObj = particleSystem->moduleName; \
     return Func(&moduleObj, para1Name); \
 }

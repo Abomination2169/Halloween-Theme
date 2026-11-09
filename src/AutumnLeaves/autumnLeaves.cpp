@@ -45,6 +45,10 @@ namespace Halloween::autumnLeaves {
 
         // Create the autumnLeaves GameObject from the dust
         autumnLeavesGo = GameObject::Instantiate(dustGo->gameObject);
+        if (!autumnLeavesGo) {
+            WARNING("Autumn leaves: failed to clone menu dust; retaining original particle system");
+            return;
+        }
         autumnLeavesGo->name = "AutumnLeavesPS";
         autumnLeavesGo->active = true;
         // GameObject::DontDestroyOnLoad(autumnLeavesGo->gameObject); // This line will enable autumnLeaves in game

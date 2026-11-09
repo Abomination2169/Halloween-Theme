@@ -86,7 +86,9 @@ namespace Halloween::autumnLeaves {
                 }
                 leafObjects[i] = clone;
                 clone->name = "AutumnLeavesPS";
-                clone->active = true;
+                // Prevent the cloned DustPS from emitting inherited startup
+                // particles before its 1-leaf/sec rate and material are set.
+                clone->active = false;
                 clone->transform->parent = nullptr;
                 clone->transform->position = Vector3(0.0f, 7.0f, 0.0f);
                 clone->transform->rotation = Quaternion::Euler(Vector3(0.0f, 0.0f, 0.0f));
@@ -124,6 +126,11 @@ namespace Halloween::autumnLeaves {
                 mainModule.set_gravityModifierMultiplier(0.025f);
                 mainModule.set_startColor(white);
 
+                // A cloned DustPS may contain already-simulated particles.
+                // Reset it so five clones do not multiply the initial burst.
+                system->Stop(true);
+                system->Clear(true);
+
                 auto emission = system->emission;
                 emission.set_enabled(true);
                 emission.set_rateOverTime(emissionRate);
@@ -136,8 +143,12 @@ namespace Halloween::autumnLeaves {
             return;
         }
 
-        // Only remove the original dust once all five emitters are configured.
+        // Only remove original dust once all five emitters are configured.
+        // Start all five clean emitters together, after the old dust is hidden.
         dustGo->active = false;
+        for (auto& leaf : leafObjects) {
+            if (leaf) leaf->active = true;
+        }
         INFO("Autumn leaves: five individual leaf textures active; original menu dust disabled");
     }
 

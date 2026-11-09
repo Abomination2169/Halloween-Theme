@@ -35,12 +35,12 @@ if "emissionRate._ctor(1.0f)" not in leaves or "mainModule.set_maxParticles(30)"
 if "UpdateLeafFloor()" not in leaves or "system->Emit(1)" not in leaves:
     raise SystemExit("Working 1.45.3 emission path was removed")
 for term in (
-    "collision.set_enabled(true)",
-    "collision.set_type(ParticleSystemCollisionType::World)",
-    "collision.set_collidesWith(LayerMask(-1))",
-    "collision.set_dampen(dampen)",
-    "collision.set_bounce(bounce)",
-    "collision.set_lifetimeLoss(lifetimeLoss)",
+    "Flair::ParticleController::CollisionModule::set_enabled(system, true)",
+    "Flair::ParticleController::CollisionModule::set_type(",
+    "Flair::ParticleController::CollisionModule::set_collidesWith(system, allLayers)",
+    "Flair::ParticleController::CollisionModule::set_dampen(",
+    "Flair::ParticleController::CollisionModule::set_bounce(",
+    "Flair::ParticleController::CollisionModule::set_lifetimeLoss(",
 ):
     if term not in leaves:
         raise SystemExit(f"World leaf collision configuration missing: {term}")

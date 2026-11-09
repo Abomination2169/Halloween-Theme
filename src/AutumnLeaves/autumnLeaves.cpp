@@ -186,7 +186,9 @@ namespace Halloween::autumnLeaves {
             if (leaf) {
                 auto system = leaf->GetComponent<ParticleSystem*>();
                 if (system) {
-                    // Restore the last Quest-visible emission path. Explicit\n                    // EmitParams positions made all leaves invisible on device.\n                    system->Emit(1);
+                    // Restore the last Quest-visible emission path.
+                    // Explicit EmitParams positions made leaves invisible on device.
+                    system->Emit(1);
                 }
             }
             nextLeafVariant = (nextLeafVariant + 1) % LeafVariants;

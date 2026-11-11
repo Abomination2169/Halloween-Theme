@@ -2,7 +2,7 @@
 
 Watch Halloween Theme in action!
 
-[![Halloween Theme - Beat Saber](Halloween-Banner.png)](https://www.youtube.com/watch?v=LgSdA3DGreM)
+[![Halloween Theme - Beat Saber](Halloween-README.png)](https://www.youtube.com/watch?v=LgSdA3DGreM)
 
 ▶️ **Watch on YouTube:** https://www.youtube.com/watch?v=LgSdA3DGreM
 

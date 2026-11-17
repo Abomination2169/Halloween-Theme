@@ -1,4 +1,4 @@
-name: Build Halloween QMOD
+name: Build Halloween QMOD # private 1.40.8 ghost-celebration test
 
 on:
   push:

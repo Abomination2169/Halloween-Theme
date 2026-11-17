@@ -157,10 +157,22 @@ namespace Halloween::ghostCelebration {
             // native burst emission with a 0.45/sec continuous stream and zero
             // bursts, so the controller could stop before any ghost appeared.
             // Retaining the original burst gives an immediate visible effect.
-            // v2.2: preserve the visible native burst trigger, but allow only
-            // two ghosts from each firework emitter. This prevents the bright
-            // overlapping clusters observed in the Quest screenshots.
-            Particles::MainModule::set_maxParticles(particleSystem, 2);
+            // v2.4: The Quest test still showed multiple ghosts stacked at
+            // their birth points. Preserve native bursts, but limit each
+            // individual firework system to a single living ghost; the several
+            // independent firework emitters still produce a varied celebration.
+            Particles::MainModule::set_maxParticles(particleSystem, 1);
+
+            // Distribute the birth positions across a small box instead of
+            // letting the inherited firework shape emit from one exact point.
+            // The particles still use the existing fireworks' world transforms.
+            Particles::ShapeModule::set_enabled(particleSystem, true);
+            Particles::ShapeModule::set_shapeType(
+                particleSystem, Particles::ShapeType::Box);
+            Particles::ShapeModule::set_position(
+                particleSystem, UnityEngine::Vector3(0.0f, 0.0f, 0.0f));
+            Particles::ShapeModule::set_scale(
+                particleSystem, UnityEngine::Vector3(2.0f, 0.8f, 0.5f));
             Particles::MainModule::set_startLifetime(
                 particleSystem, Particles::MinMaxCurve(5.0f, 7.0f));
             Particles::MainModule::set_startSpeed(
@@ -202,6 +214,6 @@ namespace Halloween::ghostCelebration {
             ++updated;
         }
 
-        PaperLogger.info("Configured {} results celebration particle systems with billboard wispy rising ghosts (v2.3)", updated);
+        PaperLogger.info("Configured {} results celebration particle systems with billboard wispy rising ghosts with separated spawns (v2.4)", updated);
     }
 }

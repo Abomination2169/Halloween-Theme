@@ -7,4 +7,5 @@ namespace GlobalNamespace {
 namespace Halloween::ghostCelebration {
     void LoadSounds();
     bool PlaySound(GlobalNamespace::FireworkItemController* controller);
+    void ApplyGhostParticles(GlobalNamespace::FireworkItemController* controller);
 }

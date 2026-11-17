@@ -1,24 +1,26 @@
-# Cartoon ghost sound test — Beat Saber 1.40.8
+# Cartoon Ghost Sound Test — Beat Saber 1.40.8
 
-This branch supports two optional user-supplied sounds. Because the Pixabay Content License restricts standalone redistribution, the source repository and QMOD do not redistribute those sound files as individual archives.
+The user has now supplied **both** desired tracks:
 
-- **Ghost Woo**, Shut_Up_Ghost — https://pixabay.com/sound-effects/horror-ghost-woo-135543/
-- **Spooky Cartoon Ghost Wooo**, FadingEmbersAudio — https://pixabay.com/sound-effects/horror-spooky-cartoon-ghost-wooo-430234/
+| Quest filename | Source | Creator |
+|---|---|---|
+| `ghost_cartoon_wooo.ogg` | [Spooky Cartoon Ghost Wooo](https://pixabay.com/sound-effects/horror-spooky-cartoon-ghost-wooo-430234/) | FadingEmbersAudio |
+| `ghost_woo.ogg` | [Ghost Woo](https://pixabay.com/sound-effects/horror-ghost-woo-135543/) | Shut_Up_Ghost |
 
-License: https://pixabay.com/service/terms/
+The two user-uploaded MP3 files were converted locally to OGG Vorbis, 44.1 kHz mono, for Quest testing.
 
-## Test the uploaded Ghost Woo track
+## Why files are separate from the QMOD
 
-The user supplied the *Ghost Woo* MP3; an OGG conversion has been prepared as `ghost_woo.ogg`. Copy that converted file to:
+Both recordings use the [Pixabay Content License](https://pixabay.com/service/terms/). Although the license permits use in creative works, it restricts standalone redistribution. The repository and its public QMOD intentionally do **not** embed these individual third-party audio files or publish their original recordings.
 
-`/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_woo.ogg`
+The user can install the personally supplied recordings locally on their headset. This is **not** a packaged public release of those sound files. Keep your own copies and license provenance.
 
-If the user separately supplies/downloads the correctly licensed *Spooky Cartoon Ghost Wooo* recording, copy it as:
+## Install for personal headset test
 
-`/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cartoon_wooo.mp3`
+Extract the two OGG files from the separately provided personal test ZIP, then copy them to:
 
-**Important:** A WAV upload labeled `cartoon_ghost_woooo(1).wav` was byte-for-byte identical to an earlier assistant-generated robotic demonstration; it is *not* the FadingEmbersAudio track and is deliberately not used.
+`/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/`
 
-The mod loads whichever of the two optional files are installed at startup. If neither exists, the three original ghost sounds are used. Fully quit/restart Beat Saber after copying sounds.
+Do not copy the ZIP itself. The OGG file names must be exact. After installing the 1.40.8 test-branch QMOD, fully quit and restart Beat Saber. The mod randomly plays available cartoon tracks; if neither file is present, it uses the three original ghost audio clips.
 
-This feature is experimental; validate Quest 3 playback before releasing. Stable branches are not modified.
+The previous WAV named `cartoon_ghost_woooo(1).wav` was an old synthesized demonstration and is **not** used. Keep the stable Halloween release and next-version branch untouched until the Quest test confirms sound playback.

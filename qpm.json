@@ -5,7 +5,7 @@
   "info": {
     "name": "Halloween",
     "id": "halloween",
-    "version": "1.0.1-test",
+    "version": "1.0.0",
     "url": null,
     "additionalData": {
       "overrideSoName": "libhalloween.so",

@@ -28,7 +28,7 @@ namespace Halloween::ghostCelebration {
         // Only user-installed recordings are used: these Pixabay tracks are
         // not uploaded to or redistributed by the public source repository.
         const std::array<std::string, 2> cartoonSoundPaths = {
-            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cartoon_wooo.mp3",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cartoon_wooo.ogg",
             "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_woo.ogg"
         };
         const std::array<std::string, 3> fallbackSoundPaths = {

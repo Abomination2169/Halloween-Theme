@@ -14,6 +14,7 @@
 #include "UnityEngine/Material.hpp"
 #include "UnityEngine/Shader.hpp"
 #include "UnityEngine/Color.hpp"
+#include "UnityEngine/Vector3.hpp"
 #include "System/Threading/Tasks/Tasks.hpp"
 #include "custom-types/shared/delegate.hpp"
 
@@ -78,11 +79,17 @@ namespace Halloween::ghostCelebration {
     void ApplyGhostParticles(GlobalNamespace::FireworkItemController* controller) {
         if (!controller || !controller->_particleSystems) return;
 
+        // The previous 32-centimeter circular particle looked like a blue bubble.
+        // The atlas now has four complete, alpha-transparent ghost designs.
         if (!textureLoadAttempted) {
             textureLoadAttempted = true;
             ghostTexture = BSML::Utilities::LoadTextureRaw(
-                static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_particle_png)
+                static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_sprites_png)
             );
+        }
+        if (!ghostTexture) {
+            PaperLogger.info("Ghost celebration atlas could not be loaded");
+            return;
         }
 
         auto ghostShader = UnityEngine::Shader::Find("Sprites/Default");
@@ -93,29 +100,88 @@ namespace Halloween::ghostCelebration {
 
             auto* particleSystem = entry->_particleSystem.ptr();
             auto* renderer = particleSystem->GetComponent<UnityEngine::ParticleSystemRenderer*>();
-            if (renderer && ghostTexture && ghostShader) {
+            if (renderer && ghostShader) {
                 auto material = renderer->get_material();
                 if (material) {
                     material->set_shader(ghostShader);
                     material->SetTexture(StringW("_MainTex"), ghostTexture);
-                    material->SetColor(StringW("_Color"), UnityEngine::Color(0.90f, 0.96f, 1.0f, 0.78f));
+                    material->SetColor(
+                        StringW("_Color"),
+                        UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.90f)
+                    );
                 }
             }
 
-            Flair::ParticleController::MainModule::set_startLifetime(particleSystem, Flair::ParticleController::MinMaxCurve(3.2f));
-            Flair::ParticleController::MainModule::set_startSpeed(particleSystem, Flair::ParticleController::MinMaxCurve(0.55f));
-            Flair::ParticleController::MainModule::set_startSize(particleSystem, Flair::ParticleController::MinMaxCurve(0.32f));
-            Flair::ParticleController::MainModule::set_gravityModifier(particleSystem, Flair::ParticleController::MinMaxCurve(-0.04f));
+            using Particles = Flair::ParticleController;
+            // Four columns, one ghost per cell. Choose a random cell once at
+            // birth; do NOT animate through all four faces within one particle.
+            Particles::TextureSheetAnimationModule::set_enabled(particleSystem, true);
+            Particles::TextureSheetAnimationModule::set_mode(
+                particleSystem, Particles::AnimationMode::Grid);
+            Particles::TextureSheetAnimationModule::set_numTilesX(particleSystem, 4);
+            Particles::TextureSheetAnimationModule::set_numTilesY(particleSystem, 1);
+            Particles::TextureSheetAnimationModule::set_frameOverTime(
+                particleSystem, Particles::MinMaxCurve(0.0f));
+            Particles::TextureSheetAnimationModule::set_startFrame(
+                particleSystem, Particles::MinMaxCurve(0.0f, 3.99f));
+            Particles::TextureSheetAnimationModule::set_cycleCount(particleSystem, 1);
 
-            Flair::ParticleController::MinMaxGradient tint{};
-            tint.mode = Flair::ParticleController::GradientMode::Color;
-            tint.colorMin = UnityEngine::Color(0.90f, 0.96f, 1.0f, 0.78f);
-            tint.colorMax = UnityEngine::Color(0.90f, 0.96f, 1.0f, 0.78f);
-            Flair::ParticleController::MainModule::set_startColor(particleSystem, tint);
+            // A small, steady procession instead of firework-shaped bursts.
+            Particles::MainModule::set_loop(particleSystem, true);
+            Particles::MainModule::set_duration(particleSystem, 10.0f);
+            Particles::MainModule::set_startLifetime(
+                particleSystem, Particles::MinMaxCurve(6.0f, 8.5f));
+            Particles::MainModule::set_startSpeed(
+                particleSystem, Particles::MinMaxCurve(0.02f, 0.12f));
+            Particles::MainModule::set_startSize(
+                particleSystem, Particles::MinMaxCurve(1.05f, 1.48f));
+            Particles::MainModule::set_maxParticles(particleSystem, 6);
+            Particles::MainModule::set_gravityModifier(
+                particleSystem, Particles::MinMaxCurve(0.0f));
+            Particles::MainModule::set_startRotation(
+                particleSystem, Particles::MinMaxCurve(-0.14f, 0.14f));
+            Particles::MainModule::set_startRotation3D(particleSystem, false);
 
+            Particles::EmissionModule::set_enabled(particleSystem, true);
+            Particles::EmissionModule::set_rateOverTime(
+                particleSystem, Particles::MinMaxCurve(0.45f));
+            Particles::EmissionModule::set_rateOverDistance(
+                particleSystem, Particles::MinMaxCurve(0.0f));
+            Particles::EmissionModule::set_burstCount(particleSystem, 0);
+
+            // Rise vertically and slowly travel farther into the scene.
+            // Scene coordinate orientation can be tuned after the Quest test.
+            Particles::VelocityOverLifetimeModule::set_enabled(particleSystem, true);
+            Particles::VelocityOverLifetimeModule::set_space(
+                particleSystem, Particles::SimulationSpace::World);
+            Particles::VelocityOverLifetimeModule::set_x(
+                particleSystem, Particles::MinMaxCurve(-0.12f, 0.12f));
+            Particles::VelocityOverLifetimeModule::set_y(
+                particleSystem, Particles::MinMaxCurve(0.36f, 0.52f));
+            Particles::VelocityOverLifetimeModule::set_z(
+                particleSystem, Particles::MinMaxCurve(0.13f, 0.30f));
+
+            Particles::NoiseModule::set_enabled(particleSystem, true);
+            Particles::NoiseModule::set_separateAxes(particleSystem, false);
+            Particles::NoiseModule::set_strength(
+                particleSystem, Particles::MinMaxCurve(0.12f));
+            Particles::NoiseModule::set_frequency(particleSystem, 0.36f);
+
+            // The fireworks may have inherited spin, collisions or size
+            // animation. Keep the ghosts readable instead of deforming them.
+            Particles::CollisionModule::set_enabled(particleSystem, false);
+            Particles::RotationOverLifetimeModule::set_enabled(particleSystem, false);
+            Particles::SizeOverLifetimeModule::set_enabled(particleSystem, false);
+
+            Particles::MinMaxGradient tint{};
+            tint.mode = Particles::GradientMode::Color;
+            tint.colorMin = UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.90f);
+            tint.colorMax = tint.colorMin;
+            Particles::MainModule::set_startColor(particleSystem, tint);
+            // Preserve the firework's existing fade-over-lifetime gradient.
             ++updated;
         }
 
-        PaperLogger.info("Applied ghost appearance to {} results celebration particle systems", updated);
+        PaperLogger.info("Configured {} results celebration particle systems with four drifting ghost sprites", updated);
     }
 }

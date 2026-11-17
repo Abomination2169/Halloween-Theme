@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="256" viewBox="0 0 1024 256">
+<defs>
+<radialGradient id="ghost" cx="42%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff" stop-opacity=".97"/><stop offset=".43" stop-color="#f5f9ff" stop-opacity=".93"/><stop offset=".73" stop-color="#d8e7ff" stop-opacity=".78"/><stop offset="1" stop-color="#a0b7e5" stop-opacity=".12"/></radialGradient>
+<linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffffff" stop-opacity=".8"/><stop offset="1" stop-color="#e1eaff" stop-opacity="0"/></linearGradient>
+<filter id="soft"><feGaussianBlur stdDeviation="2"/></filter>
+<g id="face"><ellipse cx="-13" cy="-10" rx="6" ry="10" fill="#252238" transform="rotate(-13 -13 -10)"/><ellipse cx="12" cy="-10" rx="6" ry="10" fill="#252238" transform="rotate(12 12 -10)"/><path d="M-9 7 Q-14 4 -10 20 Q-4 39 0 39 Q7 36 11 17 Q12 3 5 7 Q0 10 -9 7Z" fill="#252238"/></g>
+</defs>
+<!-- Each tile contains one complete ghost. Transparent pixels are true alpha, not a checkerboard. -->
+<g>
+<path d="M128 46 C112 42 99 55 96 76 C91 96 82 104 65 115 C49 117 34 112 23 104 C26 122 46 128 59 127 C44 137 37 142 36 154 C50 145 64 138 85 137 C95 155 114 164 128 177 C141 195 126 218 113 238 C140 225 154 205 154 187 C157 170 143 155 153 139 C175 128 192 128 212 139 C201 123 187 117 172 115 C190 106 207 104 227 108 C213 92 195 92 180 95 C165 98 161 85 159 73 C157 52 143 43 128 46Z" fill="url(#ghost)" stroke="#e3efff" stroke-opacity=".55" stroke-width="2"/>
+<path d="M63 117 Q46 107 32 91 M59 122 Q42 119 27 121 M184 116 Q210 101 227 90 M180 118 Q201 114 226 125" fill="none" stroke="#ecf4ff" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>
+<use xlink:href="#face" transform="translate(128 85)"/>
+</g>
+<g transform="translate(256)">
+<path d="M156 53 C143 38 122 46 118 64 C112 83 119 91 100 110 C84 127 71 121 55 109 C43 95 40 79 46 63 C27 74 30 105 41 122 C58 143 80 148 98 143 C108 148 120 151 129 159 C136 178 99 190 68 205 C53 213 57 222 67 221 C58 234 43 235 31 229 C43 249 70 249 87 235 C104 220 118 213 144 204 C166 196 182 184 186 168 C188 156 185 146 195 133 C203 119 214 123 228 129 C215 113 201 109 188 111 C177 109 174 90 174 76 C174 65 167 57 156 53Z" fill="url(#ghost)" stroke="#e3efff" stroke-opacity=".55" stroke-width="2"/>
+<path d="M45 69 Q38 51 22 42 M47 67 Q46 46 54 31 M207 117 Q225 101 229 85 M204 119 Q223 113 233 123" fill="none" stroke="#eff5ff" stroke-opacity=".72" stroke-width="3" stroke-linecap="round"/>
+<use xlink:href="#face" transform="translate(144 91) rotate(22)"/>
+</g>
+<g transform="translate(512)">
+<path d="M118 48 C104 50 97 65 99 88 C99 109 91 119 77 123 C60 125 50 113 40 110 C25 104 18 119 18 137 C34 124 44 129 54 138 C65 153 90 148 102 146 C119 157 140 156 151 174 C164 196 153 208 137 222 C122 236 131 247 144 244 C130 238 149 226 160 218 C181 205 182 190 174 168 C169 149 170 139 183 132 C198 124 208 114 223 117 C214 104 204 102 190 106 C204 92 211 87 217 76 C198 81 188 92 180 99 C171 110 164 114 161 95 C156 74 149 51 134 49 C128 46 123 46 118 48Z" fill="url(#ghost)" stroke="#e3efff" stroke-opacity=".58" stroke-width="2"/>
+<path d="M38 119 Q19 107 14 96 M40 121 Q20 117 6 123 M196 110 Q217 100 230 86 M191 116 Q215 113 231 120" fill="none" stroke="#edf5ff" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>
+<use xlink:href="#face" transform="translate(126 90) rotate(-11)"/>
+</g>
+<g transform="translate(768)">
+<path d="M123 64 C108 64 97 77 97 94 C95 114 78 125 64 119 C49 115 39 109 27 116 C15 123 19 138 32 141 C23 125 36 122 45 126 C57 138 67 145 78 146 C68 162 51 167 44 184 C41 200 49 213 64 215 C53 204 53 193 63 182 C72 172 79 168 86 163 C103 179 112 189 134 191 C149 192 157 186 169 181 C184 178 197 188 198 201 C209 180 197 166 176 164 C194 158 207 148 212 131 C217 110 233 105 239 119 C242 102 230 91 216 96 C202 101 198 123 183 127 C167 125 160 121 158 106 C156 82 145 65 123 64Z" fill="url(#ghost)" stroke="#e3efff" stroke-opacity=".56" stroke-width="2"/>
+<path d="M35 126 Q21 119 15 109 M44 129 Q33 144 28 156 M216 102 Q232 90 239 83 M220 110 Q237 111 246 118" fill="none" stroke="#ecf5ff" stroke-opacity=".72" stroke-width="3" stroke-linecap="round"/>
+<use xlink:href="#face" transform="translate(126 110) rotate(8)"/>
+</g>
+</svg>

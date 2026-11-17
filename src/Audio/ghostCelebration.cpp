@@ -198,22 +198,31 @@ namespace Halloween::ghostCelebration {
             Particles::VelocityOverLifetimeModule::set_z(
                 particleSystem, Particles::MinMaxCurve(0.16f, 0.24f));
 
-            // Remove inherited firework tumble/physics. Keep the existing
-            // color-over-lifetime fade and the four random sprite cells.
+            // v2.5 diagnostic: the fireworks' inherited color fade can hide
+            // sprites before their 5-7 second lifespan is over.
             Particles::CollisionModule::set_enabled(particleSystem, false);
             Particles::RotationOverLifetimeModule::set_enabled(particleSystem, false);
             Particles::SizeOverLifetimeModule::set_enabled(particleSystem, false);
+            Particles::ColorOverLifetimeModule::set_enabled(particleSystem, false);
+            Particles::ColorBySpeedModule::set_enabled(particleSystem, false);
+            Particles::SizeBySpeedModule::set_enabled(particleSystem, false);
             Particles::NoiseModule::set_enabled(particleSystem, false);
+            Particles::MainModule::set_cullingMode(
+                particleSystem, Particles::CullingMode::AlwaysSimulate);
+            Particles::MainModule::set_stopAction(
+                particleSystem, Particles::StopAction::None);
+            Particles::MainModule::set_simulationSpace(
+                particleSystem, Particles::SimulationSpace::World);
 
             Particles::MinMaxGradient tint{};
             tint.mode = Particles::GradientMode::Color;
             tint.colorMin = UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.77f);
             tint.colorMax = tint.colorMin;
             Particles::MainModule::set_startColor(particleSystem, tint);
-            // Preserve the firework's existing fade-over-lifetime gradient.
+            // Diagnostic: constant alpha while alive. A separate controller is\n            // needed for independent ghost fading and repeated spawning.
             ++updated;
         }
 
-        PaperLogger.info("Configured {} results celebration particle systems with billboard wispy rising ghosts with separated spawns (v2.4)", updated);
+        PaperLogger.info("Configured {} results celebration particle systems with billboard ghosts with native firework fade disabled (v2.5)", updated);
     }
 }

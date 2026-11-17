@@ -11,6 +11,8 @@
 #include "UnityEngine/AudioClip.hpp"
 #include "UnityEngine/ParticleSystem.hpp"
 #include "UnityEngine/ParticleSystemRenderer.hpp"
+#include "UnityEngine/ParticleSystemRenderMode.hpp"
+#include "UnityEngine/ParticleSystemRenderSpace.hpp"
 #include "UnityEngine/Material.hpp"
 #include "UnityEngine/Shader.hpp"
 #include "UnityEngine/Color.hpp"
@@ -122,13 +124,16 @@ namespace Halloween::ghostCelebration {
             auto* particleSystem = entry->_particleSystem.ptr();
             auto* renderer = particleSystem->GetComponent<UnityEngine::ParticleSystemRenderer*>();
             if (renderer && ghostShader) {
+                // Face the player regardless of inherited fireworks render mode.
+                renderer->set_renderMode(UnityEngine::ParticleSystemRenderMode::Billboard);
+                renderer->set_alignment(UnityEngine::ParticleSystemRenderSpace::View);
                 auto material = renderer->get_material();
                 if (material) {
                     material->set_shader(ghostShader);
                     material->SetTexture(StringW("_MainTex"), ghostTexture);
                     material->SetColor(
                         StringW("_Color"),
-                        UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.70f)
+                        UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.77f)
                     );
                 }
             }
@@ -161,12 +166,12 @@ namespace Halloween::ghostCelebration {
             Particles::MainModule::set_startSpeed(
                 particleSystem, Particles::MinMaxCurve(0.10f, 0.22f));
             Particles::MainModule::set_startSize(
-                particleSystem, Particles::MinMaxCurve(1.45f, 1.90f));
+                particleSystem, Particles::MinMaxCurve(1.90f, 2.30f));
             Particles::MainModule::set_gravityModifier(
                 particleSystem, Particles::MinMaxCurve(0.0f));
             Particles::MainModule::set_startRotation3D(particleSystem, false);
             Particles::MainModule::set_startRotation(
-                particleSystem, Particles::MinMaxCurve(-0.10f, 0.10f));
+                particleSystem, Particles::MinMaxCurve(-0.055f, 0.055f));
 
             // Keep the original firework burst count and activation timing.
             // Apply gentle world-space travel away from the player, with
@@ -175,11 +180,11 @@ namespace Halloween::ghostCelebration {
             Particles::VelocityOverLifetimeModule::set_space(
                 particleSystem, Particles::SimulationSpace::World);
             Particles::VelocityOverLifetimeModule::set_x(
-                particleSystem, Particles::MinMaxCurve(-0.07f, 0.07f));
+                particleSystem, Particles::MinMaxCurve(-0.09f, 0.09f));
             Particles::VelocityOverLifetimeModule::set_y(
-                particleSystem, Particles::MinMaxCurve(0.30f, 0.43f));
+                particleSystem, Particles::MinMaxCurve(0.27f, 0.37f));
             Particles::VelocityOverLifetimeModule::set_z(
-                particleSystem, Particles::MinMaxCurve(0.10f, 0.18f));
+                particleSystem, Particles::MinMaxCurve(0.16f, 0.24f));
 
             // Remove inherited firework tumble/physics. Keep the existing
             // color-over-lifetime fade and the four random sprite cells.
@@ -190,13 +195,13 @@ namespace Halloween::ghostCelebration {
 
             Particles::MinMaxGradient tint{};
             tint.mode = Particles::GradientMode::Color;
-            tint.colorMin = UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.70f);
+            tint.colorMin = UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.77f);
             tint.colorMax = tint.colorMin;
             Particles::MainModule::set_startColor(particleSystem, tint);
             // Preserve the firework's existing fade-over-lifetime gradient.
             ++updated;
         }
 
-        PaperLogger.info("Configured {} results celebration particle systems with sparse rising ghosts (v2.2)", updated);
+        PaperLogger.info("Configured {} results celebration particle systems with billboard wispy rising ghosts (v2.3)", updated);
     }
 }

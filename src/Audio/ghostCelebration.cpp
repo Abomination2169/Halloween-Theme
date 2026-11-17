@@ -107,7 +107,7 @@ namespace Halloween::ghostCelebration {
                     material->SetTexture(StringW("_MainTex"), ghostTexture);
                     material->SetColor(
                         StringW("_Color"),
-                        UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.90f)
+                        UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.70f)
                     );
                 }
             }
@@ -131,26 +131,51 @@ namespace Halloween::ghostCelebration {
             // native burst emission with a 0.45/sec continuous stream and zero
             // bursts, so the controller could stop before any ghost appeared.
             // Retaining the original burst gives an immediate visible effect.
+            // v2.2: preserve the visible native burst trigger, but allow only
+            // two ghosts from each firework emitter. This prevents the bright
+            // overlapping clusters observed in the Quest screenshots.
+            Particles::MainModule::set_maxParticles(particleSystem, 2);
             Particles::MainModule::set_startLifetime(
-                particleSystem, Particles::MinMaxCurve(3.8f));
+                particleSystem, Particles::MinMaxCurve(5.0f, 7.0f));
             Particles::MainModule::set_startSpeed(
-                particleSystem, Particles::MinMaxCurve(0.40f));
+                particleSystem, Particles::MinMaxCurve(0.10f, 0.22f));
             Particles::MainModule::set_startSize(
-                particleSystem, Particles::MinMaxCurve(0.95f));
+                particleSystem, Particles::MinMaxCurve(1.45f, 1.90f));
             Particles::MainModule::set_gravityModifier(
-                particleSystem, Particles::MinMaxCurve(-0.02f));
-            // Do not change loop/duration/maxParticles/emission/burstCount,
-            // or overwrite the original shape or other particle modules.
+                particleSystem, Particles::MinMaxCurve(0.0f));
+            Particles::MainModule::set_startRotation3D(particleSystem, false);
+            Particles::MainModule::set_startRotation(
+                particleSystem, Particles::MinMaxCurve(-0.10f, 0.10f));
+
+            // Keep the original firework burst count and activation timing.
+            // Apply gentle world-space travel away from the player, with
+            // a little horizontal variation between individual ghosts.
+            Particles::VelocityOverLifetimeModule::set_enabled(particleSystem, true);
+            Particles::VelocityOverLifetimeModule::set_space(
+                particleSystem, Particles::SimulationSpace::World);
+            Particles::VelocityOverLifetimeModule::set_x(
+                particleSystem, Particles::MinMaxCurve(-0.07f, 0.07f));
+            Particles::VelocityOverLifetimeModule::set_y(
+                particleSystem, Particles::MinMaxCurve(0.30f, 0.43f));
+            Particles::VelocityOverLifetimeModule::set_z(
+                particleSystem, Particles::MinMaxCurve(0.10f, 0.18f));
+
+            // Remove inherited firework tumble/physics. Keep the existing
+            // color-over-lifetime fade and the four random sprite cells.
+            Particles::CollisionModule::set_enabled(particleSystem, false);
+            Particles::RotationOverLifetimeModule::set_enabled(particleSystem, false);
+            Particles::SizeOverLifetimeModule::set_enabled(particleSystem, false);
+            Particles::NoiseModule::set_enabled(particleSystem, false);
 
             Particles::MinMaxGradient tint{};
             tint.mode = Particles::GradientMode::Color;
-            tint.colorMin = UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.90f);
+            tint.colorMin = UnityEngine::Color(1.0f, 1.0f, 1.0f, 0.70f);
             tint.colorMax = tint.colorMin;
             Particles::MainModule::set_startColor(particleSystem, tint);
             // Preserve the firework's existing fade-over-lifetime gradient.
             ++updated;
         }
 
-        PaperLogger.info("Configured {} results celebration particle systems with four drifting ghost sprites", updated);
+        PaperLogger.info("Configured {} results celebration particle systems with sparse rising ghosts (v2.2)", updated);
     }
 }

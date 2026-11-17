@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - port/beat-saber-1.45.3
+      - feature/ghost-results-celebration
     tags:
       - "v*"
   pull_request:
@@ -112,13 +113,13 @@ jobs:
               cover = manifest.get("coverImage")
               if cover and cover not in names:
                   raise SystemExit(f"QMOD is missing cover image: {cover}")
-              expected_audio = {"Ghostly_Horror_Menu.ogg"}
+              expected_audio = {"Ghostly_Horror_Menu.ogg", "ghost_moan_01.ogg", "ghost_moan_02.ogg", "ghost_breath.ogg"}
               actual_audio = {Path(item["name"]).name for item in manifest.get("fileCopies", [])}
               if actual_audio != expected_audio:
                   raise SystemExit(f"Unexpected audio fileCopies: {sorted(actual_audio)}")
               if not expected_audio.issubset(names):
                   raise SystemExit("QMOD is missing Ghostly_Horror_Menu.ogg")
-          print("QMOD validated: 1.45.3 manifest, library, cover, and menu audio.")
+          print("QMOD validated: 1.45.3 manifest, library, cover, menu audio, and ghost celebration audio.")
           PY
 
       - name: Upload build artifact

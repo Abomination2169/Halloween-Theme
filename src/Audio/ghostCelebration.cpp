@@ -60,6 +60,10 @@ namespace Halloween::ghostCelebration {
     }
 
     bool PlaySound(GlobalNamespace::FireworkItemController* controller) {
+        // Unity objects should not be created from modloader's early startup path.
+        // Defer MediaAsyncLoader creation until the results-screen firework hook runs.
+        if (!loadStarted) LoadSounds();
+
         if (!controller || !controller->_audioSource || ghostClips.empty()) return false;
 
         const auto index = static_cast<std::size_t>(std::rand()) % ghostClips.size();

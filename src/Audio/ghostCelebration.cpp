@@ -81,7 +81,7 @@ namespace Halloween::ghostCelebration {
             );
         }
 
-        auto* ghostShader = UnityEngine::Shader::Find("Sprites/Default");
+        auto ghostShader = UnityEngine::Shader::Find("Sprites/Default");
         int updated = 0;
 
         for (auto* entry : controller->_particleSystems) {
@@ -90,7 +90,7 @@ namespace Halloween::ghostCelebration {
             auto* particleSystem = entry->_particleSystem.ptr();
             auto* renderer = particleSystem->GetComponent<UnityEngine::ParticleSystemRenderer*>();
             if (renderer && ghostTexture && ghostShader) {
-                auto* material = renderer->get_material();
+                auto material = renderer->get_material();
                 if (material) {
                     material->set_shader(ghostShader);
                     material->SetTexture(StringW("_MainTex"), ghostTexture);

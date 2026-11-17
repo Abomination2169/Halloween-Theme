@@ -23,6 +23,12 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
+      - name: Generate four transparent ghost sprites
+        run: |
+          python3 -m pip install --break-system-packages cairosvg
+          python3 scripts/render-ghost-sprites.py
+          test -s assets/ghost_sprites.png
+
       - name: Audit source configuration and package metadata
         run: python3 scripts/audit-source.py
 

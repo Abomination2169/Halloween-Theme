@@ -43,6 +43,18 @@
     {
       "name": "Ghostly_Horror_Menu.ogg",
       "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/Ghostly_Horror_Menu.ogg"
+    },
+    {
+      "name": "ghost_moan_01.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_moan_01.ogg"
+    },
+    {
+      "name": "ghost_moan_02.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_moan_02.ogg"
+    },
+    {
+      "name": "ghost_breath.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_breath.ogg"
     }
   ]
 }

@@ -25,7 +25,13 @@
 
 namespace Halloween::ghostCelebration {
     namespace {
-        const std::array<std::string, 3> soundPaths = {
+        // Only user-installed recordings are used: these Pixabay tracks are
+        // not uploaded to or redistributed by the public source repository.
+        const std::array<std::string, 2> cartoonSoundPaths = {
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cartoon_wooo.mp3",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_woo.mp3"
+        };
+        const std::array<std::string, 3> fallbackSoundPaths = {
             "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_moan_01.ogg",
             "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_moan_02.ogg",
             "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_breath.ogg"
@@ -41,7 +47,13 @@ namespace Halloween::ghostCelebration {
         if (loadStarted) return;
         loadStarted = true;
 
-        for (const auto& path : soundPaths) {
+        const bool useCartoon =
+            fileexists(cartoonSoundPaths[0]) && fileexists(cartoonSoundPaths[1]);
+        PaperLogger.info(useCartoon
+            ? "Using both user-supplied cartoon ghost recordings"
+            : "Cartoon ghost audio not yet installed; using previous ghost sounds");
+
+        const auto loadOne = [](const std::string& path) {
             if (!fileexists(path)) {
                 PaperLogger.info("Ghost celebration audio missing: {}", path);
                 continue;
@@ -57,6 +69,11 @@ namespace Halloween::ghostCelebration {
                     PaperLogger.info("Failed to load ghost celebration audio: {}", path);
                 }
             })));
+        };
+        if (useCartoon) {
+            for (const auto& path : cartoonSoundPaths) loadOne(path);
+        } else {
+            for (const auto& path : fallbackSoundPaths) loadOne(path);
         }
     }
 

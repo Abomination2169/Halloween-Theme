@@ -49,9 +49,11 @@ namespace Halloween::ghostCelebration {
 
         const bool useCartoon =
             fileexists(cartoonSoundPaths[0]) || fileexists(cartoonSoundPaths[1]);
-        PaperLogger.info(useCartoon
-            ? "Using user-supplied cartoon ghost recordings"
-            : "Cartoon ghost audio not yet installed; using previous ghost sounds");
+        if (useCartoon) {
+            PaperLogger.info("Using user-supplied cartoon ghost recordings");
+        } else {
+            PaperLogger.info("Cartoon ghost audio not yet installed; using previous ghost sounds");
+        }
 
         const auto loadOne = [](const std::string& path) {
             if (!fileexists(path)) {

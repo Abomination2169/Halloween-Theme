@@ -32,7 +32,7 @@ namespace Halloween::ghostCelebration {
 
         for (const auto& path : soundPaths) {
             if (!fileexists(path)) {
-                PaperLogger.warning("Ghost celebration audio missing: {}", path);
+                PaperLogger.info("Ghost celebration audio missing: {}", path);
                 continue;
             }
 
@@ -43,7 +43,7 @@ namespace Halloween::ghostCelebration {
                     ghostClips.push_back(clip);
                     PaperLogger.info("Loaded ghost celebration audio: {}", path);
                 } else {
-                    PaperLogger.warning("Failed to load ghost celebration audio: {}", path);
+                    PaperLogger.info("Failed to load ghost celebration audio: {}", path);
                 }
             })));
         }

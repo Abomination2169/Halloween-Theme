@@ -5,7 +5,7 @@
   "id": "halloween",
   "coverImage": "Halloween-Banner.png",
   "author": "Halloween Mod contributors",
-  "version": "1.0.0",
+  "version": "1.0.1-test",
   "packageId": "com.beatgames.beatsaber",
   "packageVersion": "1.40.8_7379",
   "description": "Happy Halloween!",
@@ -18,6 +18,18 @@
     {
       "name": "Ghostly_Horror_Menu.ogg",
       "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/Ghostly_Horror_Menu.ogg"
+    },
+    {
+      "name": "ghost_moan_01.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_moan_01.ogg"
+    },
+    {
+      "name": "ghost_moan_02.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_moan_02.ogg"
+    },
+    {
+      "name": "ghost_breath.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_breath.ogg"
     }
   ]
 }

@@ -126,52 +126,21 @@ namespace Halloween::ghostCelebration {
                 particleSystem, Particles::MinMaxCurve(0.0f, 3.99f));
             Particles::TextureSheetAnimationModule::set_cycleCount(particleSystem, 1);
 
-            // A small, steady procession instead of firework-shaped bursts.
-            Particles::MainModule::set_loop(particleSystem, true);
-            Particles::MainModule::set_duration(particleSystem, 10.0f);
+            // IMPORTANT: Keep Beat Saber's native firework burst scheduling.
+            // Results celebrations are short-lived. The previous test replaced
+            // native burst emission with a 0.45/sec continuous stream and zero
+            // bursts, so the controller could stop before any ghost appeared.
+            // Retaining the original burst gives an immediate visible effect.
             Particles::MainModule::set_startLifetime(
-                particleSystem, Particles::MinMaxCurve(6.0f, 8.5f));
+                particleSystem, Particles::MinMaxCurve(3.8f));
             Particles::MainModule::set_startSpeed(
-                particleSystem, Particles::MinMaxCurve(0.02f, 0.12f));
+                particleSystem, Particles::MinMaxCurve(0.40f));
             Particles::MainModule::set_startSize(
-                particleSystem, Particles::MinMaxCurve(1.05f, 1.48f));
-            Particles::MainModule::set_maxParticles(particleSystem, 6);
+                particleSystem, Particles::MinMaxCurve(0.95f));
             Particles::MainModule::set_gravityModifier(
-                particleSystem, Particles::MinMaxCurve(0.0f));
-            Particles::MainModule::set_startRotation(
-                particleSystem, Particles::MinMaxCurve(-0.14f, 0.14f));
-            Particles::MainModule::set_startRotation3D(particleSystem, false);
-
-            Particles::EmissionModule::set_enabled(particleSystem, true);
-            Particles::EmissionModule::set_rateOverTime(
-                particleSystem, Particles::MinMaxCurve(0.45f));
-            Particles::EmissionModule::set_rateOverDistance(
-                particleSystem, Particles::MinMaxCurve(0.0f));
-            Particles::EmissionModule::set_burstCount(particleSystem, 0);
-
-            // Rise vertically and slowly travel farther into the scene.
-            // Scene coordinate orientation can be tuned after the Quest test.
-            Particles::VelocityOverLifetimeModule::set_enabled(particleSystem, true);
-            Particles::VelocityOverLifetimeModule::set_space(
-                particleSystem, Particles::SimulationSpace::World);
-            Particles::VelocityOverLifetimeModule::set_x(
-                particleSystem, Particles::MinMaxCurve(-0.12f, 0.12f));
-            Particles::VelocityOverLifetimeModule::set_y(
-                particleSystem, Particles::MinMaxCurve(0.36f, 0.52f));
-            Particles::VelocityOverLifetimeModule::set_z(
-                particleSystem, Particles::MinMaxCurve(0.13f, 0.30f));
-
-            Particles::NoiseModule::set_enabled(particleSystem, true);
-            Particles::NoiseModule::set_separateAxes(particleSystem, false);
-            Particles::NoiseModule::set_strength(
-                particleSystem, Particles::MinMaxCurve(0.12f));
-            Particles::NoiseModule::set_frequency(particleSystem, 0.36f);
-
-            // The fireworks may have inherited spin, collisions or size
-            // animation. Keep the ghosts readable instead of deforming them.
-            Particles::CollisionModule::set_enabled(particleSystem, false);
-            Particles::RotationOverLifetimeModule::set_enabled(particleSystem, false);
-            Particles::SizeOverLifetimeModule::set_enabled(particleSystem, false);
+                particleSystem, Particles::MinMaxCurve(-0.02f));
+            // Do not change loop/duration/maxParticles/emission/burstCount,
+            // or overwrite the original shape or other particle modules.
 
             Particles::MinMaxGradient tint{};
             tint.mode = Particles::GradientMode::Color;

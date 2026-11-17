@@ -83,7 +83,7 @@ MAKE_HOOK_MATCH(SongPreviewPlayer_CrossfadeTo, static_cast<void(SongPreviewPlaye
     SongPreviewPlayer_CrossfadeTo(self, audioClip, musicVolume, startTime, duration, isDefault, onFadeOutCallback);
 }
 
-// Replace results-screen firework explosion audio with a randomized ghost vocalization.
+// Replace results-screen firework particles and explosion audio with ghost effects.\nMAKE_HOOK_MATCH(FireworkGhostParticles, &GlobalNamespace::FireworkItemController::InitializeParticleSystem, void, GlobalNamespace::FireworkItemController* self) {\n    FireworkGhostParticles(self);\n    Halloween::ghostCelebration::ApplyGhostParticles(self);\n}\n\n// Replace results-screen firework explosion audio with a randomized ghost vocalization.
 MAKE_HOOK_MATCH(FireworkGhostAudio, &GlobalNamespace::FireworkItemController::PlayExplosionSound, void, GlobalNamespace::FireworkItemController* self) {
     if (Halloween::ghostCelebration::PlaySound(self)) return;
     FireworkGhostAudio(self);
@@ -226,7 +226,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
 
     INSTALL_HOOK(PaperLogger, SongPreviewPlayer_OnEnable);
     INSTALL_HOOK(PaperLogger, SongPreviewPlayer_CrossfadeTo);
-    INSTALL_HOOK(PaperLogger, FireworkGhostAudio);
+    INSTALL_HOOK(PaperLogger, FireworkGhostParticles);\n    INSTALL_HOOK(PaperLogger, FireworkGhostAudio);
     //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidActivate);
     //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidDeactivate);
     //INSTALL_HOOK(PaperLogger, MultiplayerModeSelectionFlowCoordinator_DidActivate);

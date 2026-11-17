@@ -56,7 +56,7 @@ namespace Halloween::ghostCelebration {
         const auto loadOne = [](const std::string& path) {
             if (!fileexists(path)) {
                 PaperLogger.info("Ghost celebration audio missing: {}", path);
-                continue;
+                return;
             }
 
             auto loadTask = GlobalNamespace::MediaAsyncLoader::New_ctor()->LoadAudioClipFromFilePathAsync(path);

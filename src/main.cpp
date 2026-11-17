@@ -16,6 +16,8 @@
 #include "Menu/ObjectInstances.hpp"
 
 #include "Audio/player.hpp"
+#include "Audio/ghostCelebration.hpp"
+#include "GlobalNamespace/FireworkItemController.hpp"
 
 #include "GlobalNamespace/SongPreviewPlayer.hpp"
 #include "UnityEngine/AudioSource.hpp"
@@ -79,6 +81,12 @@ MAKE_HOOK_MATCH(SongPreviewPlayer_CrossfadeTo, static_cast<void(SongPreviewPlaye
     // Choose a new random main menu song when transitioning away from the main menu music
     if(getModConfig().EnableMenuMusic.GetValue() && self->_defaultAudioClip && self->_defaultAudioClip.ptr() != audioClip) PlayRandomSong(self);
     SongPreviewPlayer_CrossfadeTo(self, audioClip, musicVolume, startTime, duration, isDefault, onFadeOutCallback);
+}
+
+// Replace results-screen firework explosion audio with a randomized ghost vocalization.
+MAKE_HOOK_MATCH(FireworkGhostAudio, &GlobalNamespace::FireworkItemController::PlayExplosionSound, void, GlobalNamespace::FireworkItemController* self) {
+    if (Halloween::ghostCelebration::PlaySound(self)) return;
+    FireworkGhostAudio(self);
 }
 
 // float BytesToFloat(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
@@ -207,6 +215,8 @@ MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
 MOD_EXTERN_FUNC void late_load() noexcept {
     i2c::functions::initialize();
 
+    Halloween::ghostCelebration::LoadSounds();
+
 
     INFO("Installing hooks...");
     //INSTALL_HOOK(PaperLogger, NoteControllerInit);
@@ -216,6 +226,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
 
     INSTALL_HOOK(PaperLogger, SongPreviewPlayer_OnEnable);
     INSTALL_HOOK(PaperLogger, SongPreviewPlayer_CrossfadeTo);
+    INSTALL_HOOK(PaperLogger, FireworkGhostAudio);
     //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidActivate);
     //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidDeactivate);
     //INSTALL_HOOK(PaperLogger, MultiplayerModeSelectionFlowCoordinator_DidActivate);

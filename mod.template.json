@@ -20,16 +20,20 @@
       "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/Ghostly_Horror_Menu.ogg"
     },
     {
-      "name": "ghost_cc0_ogrebane_original.ogg",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cc0_ogrebane_original.ogg"
+      "name": "ghost_ogrebane.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_ogrebane.ogg"
     },
     {
-      "name": "ghost_cc0_ogrebane_lower.ogg",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cc0_ogrebane_lower.ogg"
+      "name": "ghost_scary_1.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_scary_1.ogg"
     },
     {
-      "name": "ghost_cc0_ogrebane_higher.ogg",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cc0_ogrebane_higher.ogg"
+      "name": "ghost_breath.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_breath.ogg"
+    },
+    {
+      "name": "GHOST_AUDIO_CREDITS.txt",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/GHOST_AUDIO_CREDITS.txt"
     }
   ]
 }

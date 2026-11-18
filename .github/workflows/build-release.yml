@@ -11,6 +11,7 @@ on:
       - feature/ghost-art-variety-1.40.8
       - feature/ghost-variety-final-four-1.40.8
       - feature/new-ghosts-only-1.40.8
+      - feature/three-ghost-voices-1.40.8
     tags:
       - "v*"
   pull_request:
@@ -48,10 +49,10 @@ jobs:
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
           "$RUNNER_TEMP/bin/ffmpeg" -version
 
-      - name: Prepare three licensed CC0 Ogrebane ghost sound variants
+      - name: Prepare three independently licensed OpenGameArt ghost recordings
         run: |
           python3 scripts/generate_original_ghost_sfx.py
-          for name in ghost_cc0_ogrebane_original ghost_cc0_ogrebane_lower ghost_cc0_ogrebane_higher; do
+          for name in ghost_ogrebane ghost_scary_1 ghost_breath; do
             test -s "FileCopies/$name.ogg"
           done
 
@@ -142,12 +143,12 @@ jobs:
               cover = manifest.get("coverImage")
               if cover and cover not in names:
                   raise SystemExit(f"QMOD is missing cover image: {cover}")
-              expected_audio = {"Ghostly_Horror_Menu.ogg", "ghost_cc0_ogrebane_original.ogg", "ghost_cc0_ogrebane_lower.ogg", "ghost_cc0_ogrebane_higher.ogg"}
+              expected_audio = {"Ghostly_Horror_Menu.ogg", "ghost_ogrebane.ogg", "ghost_scary_1.ogg", "ghost_breath.ogg", "GHOST_AUDIO_CREDITS.txt"}
               actual_audio = {Path(item["name"]).name for item in manifest.get("fileCopies", [])}
               if actual_audio != expected_audio:
                   raise SystemExit(f"Unexpected audio fileCopies: {sorted(actual_audio)}")
               if not expected_audio.issubset(names):
-                  raise SystemExit("QMOD is missing Ghostly_Horror_Menu.ogg")
+                  raise SystemExit("QMOD is missing one or more declared audio/credit files")
           print("QMOD validated: 1.40.8 manifest, library, cover, menu audio, and ghost celebration audio.")
           PY
 

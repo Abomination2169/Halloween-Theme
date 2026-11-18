@@ -21,6 +21,8 @@
 #include "AutumnLeaves/particleController.hpp"
 #include "custom-types/shared/register.hpp"
 #include "GlobalNamespace/FireworkItemController.hpp"
+#include "GlobalNamespace/ResultsViewController.hpp"
+#include "GlobalNamespace/LevelCompletionResults.hpp"
 
 #include "GlobalNamespace/SongPreviewPlayer.hpp"
 #include "UnityEngine/AudioSource.hpp"
@@ -86,6 +88,22 @@ MAKE_HOOK_MATCH(SongPreviewPlayer_CrossfadeTo, static_cast<void(SongPreviewPlaye
     SongPreviewPlayer_CrossfadeTo(self, audioClip, musicVolume, startTime, duration, isDefault, onFadeOutCallback);
 }
 
+// The results view owns the ghost lifecycle. RankModel::Rank is ordered
+// E=0 D=1 C=2 B=3 A=4 S=5 SS=6 SSS=7 in the 1.40.8 codegen.
+MAKE_HOOK_MATCH(HalloweenGhostResultsDidActivate, &GlobalNamespace::ResultsViewController::DidActivate, void,
+    GlobalNamespace::ResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    HalloweenGhostResultsDidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+    auto* completed = self ? self->__cordl_internal_get__levelCompletionResults() : nullptr;
+    const bool rankAOrAbove = completed && completed->__cordl_internal_get_rank().value__ >= 4;
+    Halloween::ghostDrift::SetResultsScreen(self, rankAOrAbove);
+}
+
+MAKE_HOOK_MATCH(HalloweenGhostResultsDidDeactivate, &GlobalNamespace::ResultsViewController::DidDeactivate, void,
+    GlobalNamespace::ResultsViewController* self, bool removedFromHierarchy, bool screenSystemDisabling) {
+    Halloween::ghostDrift::EndResultsScreen();
+    HalloweenGhostResultsDidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
+}
+
 // Results-screen celebration: replace firework particles and their explosion sound.
 MAKE_HOOK_MATCH(FireworkGhostParticles, &GlobalNamespace::FireworkItemController::InitializeParticleSystem, void, GlobalNamespace::FireworkItemController* self) {
     FireworkGhostParticles(self);
@@ -99,14 +117,15 @@ MAKE_HOOK_MATCH(FireworkGhostParticles, &GlobalNamespace::FireworkItemController
                     entry->_particleSystem.ptr(), false);
             }
         }
-    } else {
-        // Keep the old verified behavior if camera/sprites are unavailable.
+    } else if (Halloween::ghostDrift::IsEligible()) {
+        // For rank A+ only: keep the old implementation as a fallback if
+        // the dedicated ghost controller cannot start.
         Halloween::ghostCelebration::ApplyGhostParticles(self);
     }
 }
 
 MAKE_HOOK_MATCH(FireworkGhostAudio, &GlobalNamespace::FireworkItemController::PlayExplosionSound, void, GlobalNamespace::FireworkItemController* self) {
-    if (Halloween::ghostCelebration::PlaySound(self)) return;
+    if (Halloween::ghostDrift::IsEligible() && Halloween::ghostCelebration::PlaySound(self)) return;
     FireworkGhostAudio(self);
 }
 
@@ -246,6 +265,8 @@ MOD_EXTERN_FUNC void late_load() noexcept {
 
     INSTALL_HOOK(PaperLogger, SongPreviewPlayer_OnEnable);
     INSTALL_HOOK(PaperLogger, SongPreviewPlayer_CrossfadeTo);
+    INSTALL_HOOK(PaperLogger, HalloweenGhostResultsDidActivate);
+    INSTALL_HOOK(PaperLogger, HalloweenGhostResultsDidDeactivate);
     INSTALL_HOOK(PaperLogger, FireworkGhostParticles);
     INSTALL_HOOK(PaperLogger, FireworkGhostAudio);
     //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidActivate);

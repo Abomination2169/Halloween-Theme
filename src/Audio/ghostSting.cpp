@@ -46,12 +46,12 @@ namespace Halloween::ghostSting {
             task->GetAwaiter().OnCompleted(
                 custom_types::MakeDelegate<System::Action*>(std::function([task]() {
                     loading = false;
-                    auto* clip = task->get_Result();
+                    auto clip = task->get_Result();
                     if (!clip) {
                         PaperLogger.info("Unable to load celebration sting");
                         return;
                     }
-                    cachedClip = clip;
+                    cachedClip = clip.ptr();
                     PlayLoadedOnce();
                 }))
             );

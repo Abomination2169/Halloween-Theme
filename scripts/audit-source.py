@@ -12,7 +12,7 @@ config = (root / "include/c.hpp").read_text(encoding="utf-8")
 workflow = (root / ".github/workflows/build-release.yml").read_text(encoding="utf-8")
 
 assert qpm["info"]["id"] == manifest["id"] == "halloween"
-assert qpm["info"]["version"] == manifest["version"] == "1.0.1"
+assert qpm["info"]["version"] == manifest["version"] == "1.0.2"
 assert manifest["packageVersion"] == "1.40.8_7379"
 assert qpm["info"]["additionalData"]["overrideSoName"] == "libhalloween.so"
 assert (root / manifest["coverImage"]).is_file()

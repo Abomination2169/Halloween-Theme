@@ -37,11 +37,16 @@ jobs:
           for i in 0 1 2 3; do test -s "assets/ghost_single_$i.png"; done
           for i in 0 1 2 3 4 5 6 7; do test -s "assets/ghost_new_$i.png"; done
 
-      - name: Verify runner build tools
+      - name: Prepare runner build tools and FFmpeg
         run: |
-          for executable in cmake ninja unzip curl python3 ffmpeg; do
+          for executable in cmake ninja unzip curl python3; do
             command -v "$executable" || { echo "Missing $executable on Ubuntu runner"; exit 1; }
           done
+          python3 -m pip install --break-system-packages imageio-ffmpeg
+          mkdir -p "$RUNNER_TEMP/bin"
+          ln -s "$(python3 -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')" "$RUNNER_TEMP/bin/ffmpeg"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/bin/ffmpeg" -version
 
       - name: Prepare three licensed CC0 Ogrebane ghost sound variants
         run: |

@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feature/ghost-results-1.40.8
+      - feature/dedicated-ghost-controller-1.40.8
     tags:
       - "v*"
   pull_request:
@@ -25,9 +26,10 @@ jobs:
 
       - name: Generate four transparent ghost sprites
         run: |
-          python3 -m pip install --break-system-packages cairosvg
+          python3 -m pip install --break-system-packages cairosvg pillow
           python3 scripts/render-ghost-sprites.py
           test -s assets/ghost_sprites.png
+          for i in 0 1 2 3; do test -s "assets/ghost_single_$i.png"; done
 
       - name: Audit source configuration and package metadata
         run: python3 scripts/audit-source.py

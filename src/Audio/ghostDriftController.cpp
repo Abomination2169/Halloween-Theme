@@ -22,6 +22,9 @@
 #include <cmath>
 #include <cstdlib>
 #include <vector>
+#include <fstream>
+#include <iterator>
+#include <string>
 
 DEFINE_TYPE(Halloween, GhostDriftController);
 
@@ -63,7 +66,20 @@ namespace {
         if (root) UnityEngine::Object::Destroy(root.ptr());
         root = nullptr;
     }
-    std::array<Sprite*, 12> sprites = {};
+    std::array<Sprite*, 16> sprites = {};
+    std::vector<Sprite*> spritePool;
+
+    Sprite* LoadInstalledGhost(int index) {
+        const std::string path = "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_extra_" + std::to_string(index) + ".png";
+        std::ifstream file(path, std::ios::binary);
+        if (!file) {
+            PaperLogger.info("Extra ghost sprite is not installed: {}", path);
+            return nullptr;
+        }
+        std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        if (bytes.empty()) return nullptr;
+        return BSML::Utilities::LoadSpriteRaw(ArrayW<uint8_t>{bytes});
+    }
     bool texturesAttempted = false;
 
     float Random01() {
@@ -75,10 +91,7 @@ namespace {
     }
 
     bool LoadSprites() {
-        if (texturesAttempted) {
-            for (auto* sprite : sprites) if (!sprite) return false;
-            return true;
-        }
+        if (texturesAttempted) return !spritePool.empty();
         texturesAttempted = true;
         sprites[0] = BSML::Utilities::LoadSpriteRaw(
             static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_single_0_png));
@@ -104,8 +117,18 @@ namespace {
             static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_6_png));
         sprites[11] = BSML::Utilities::LoadSpriteRaw(
             static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_7_png));
-        for (auto* sprite : sprites) if (!sprite) return false;
-        return true;
+        for (int i = 0; i < 12; ++i) {
+            if (!sprites[i]) return false;
+            spritePool.push_back(sprites[i]);
+        }
+        // Four optional individually packaged test sprites: three new expressions
+        // plus the original shy/peekaboo design. All use the same animation.
+        for (int i = 0; i < 4; ++i) {
+            sprites[12 + i] = LoadInstalledGhost(i);
+            if (sprites[12 + i]) spritePool.push_back(sprites[12 + i]);
+        }
+        PaperLogger.info("Ghost sprite variants available: {}", spritePool.size());
+        return !spritePool.empty();
     }
 
     void SpawnGhost(int sequence) {
@@ -120,9 +143,9 @@ namespace {
             return;
         }
 
-        // Original four and eight additional designs share normalized 256x256 RGBA sprites.
+        // All original and new variants share normalized 256x256 RGBA sprites.
         // Every ghost picks one independently; never use a UV sprite-sheet animation.
-        renderer->set_sprite(sprites[std::rand() % sprites.size()]);
+        renderer->set_sprite(spritePool[std::rand() % spritePool.size()]);
         // Higher transparent sorting priority can help against ordinary scene
         // SpriteRenderers, but not necessarily screen-space UI canvases.
         renderer->set_sortingOrder(100);

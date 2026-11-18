@@ -79,7 +79,7 @@ namespace {
         if (!root || active.size() >= 6) return;
 
         auto* go = GameObject::New_ctor("HalloweenIndependentGhost");
-        auto* tr = go->get_transform();
+        auto* tr = go->get_transform().ptr();
         tr->SetParent(root->get_transform(), false);
         auto* renderer = go->AddComponent<SpriteRenderer*>();
         if (!renderer) {
@@ -117,13 +117,13 @@ namespace Halloween::ghostDrift {
             return false;
         }
 
-        auto* camera = UnityEngine::Camera::get_main();
+        auto* camera = UnityEngine::Camera::get_main().ptr();
         if (!camera) {
             PaperLogger.info("No main camera for dedicated ghost placement");
             return false;
         }
 
-        auto* anchor = firework->get_transform()->get_parent();
+        auto* anchor = firework->get_transform()->get_parent().ptr();
         if (!anchor) {
             PaperLogger.info("No results firework parent; use legacy particles");
             return false;
@@ -131,7 +131,7 @@ namespace Halloween::ghostDrift {
 
         auto* object = GameObject::New_ctor("HalloweenGhostResultsController");
         object->get_transform()->SetParent(anchor, true);
-        auto* camTr = camera->get_transform();
+        auto* camTr = camera->get_transform().ptr();
         const auto cam = camTr->get_position();
         const auto forward = camTr->get_forward();
         constexpr float distance = 6.5f;
@@ -184,7 +184,7 @@ void Halloween::GhostDriftController::Update() {
         float alpha = 0.69f * std::min(fadeIn, fadeOut);
         float sway = std::sin(ghost.wavePhase + ghost.age * ghost.waveSpeed)
                      * ghost.waveWidth;
-        auto* tr = ghost.gameObject->get_transform();
+        auto* tr = ghost.gameObject->get_transform().ptr();
         tr->set_localPosition(Vector3(
             ghost.startX + sway,
             ghost.startY + ghost.riseSpeed * ghost.age,

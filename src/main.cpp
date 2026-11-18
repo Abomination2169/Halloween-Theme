@@ -18,6 +18,7 @@
 #include "Audio/player.hpp"
 #include "Audio/ghostCelebration.hpp"
 #include "Audio/ghostDriftController.hpp"
+#include "Audio/ghostSting.hpp"
 #include "AutumnLeaves/particleController.hpp"
 #include "custom-types/shared/register.hpp"
 #include "GlobalNamespace/FireworkItemController.hpp"
@@ -100,6 +101,7 @@ MAKE_HOOK_MATCH(HalloweenGhostResultsDidActivate, &GlobalNamespace::ResultsViewC
     // the results screen opens. Starting only from that hook made A/S blank.
     // Start independently from the results-screen lifecycle instead.
     if (rankAOrAbove) {
+        Halloween::ghostSting::EnterResults();
         if (!Halloween::ghostDrift::Begin()) {
             PaperLogger.info("Results ghost controller could not initialize");
         }
@@ -108,6 +110,7 @@ MAKE_HOOK_MATCH(HalloweenGhostResultsDidActivate, &GlobalNamespace::ResultsViewC
 
 MAKE_HOOK_MATCH(HalloweenGhostResultsDidDeactivate, &GlobalNamespace::ResultsViewController::DidDeactivate, void,
     GlobalNamespace::ResultsViewController* self, bool removedFromHierarchy, bool screenSystemDisabling) {
+    Halloween::ghostSting::ExitResults();
     Halloween::ghostDrift::EndResultsScreen();
     HalloweenGhostResultsDidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
 }
@@ -133,7 +136,9 @@ MAKE_HOOK_MATCH(FireworkGhostParticles, &GlobalNamespace::FireworkItemController
 }
 
 MAKE_HOOK_MATCH(FireworkGhostAudio, &GlobalNamespace::FireworkItemController::PlayExplosionSound, void, GlobalNamespace::FireworkItemController* self) {
-    if (Halloween::ghostDrift::IsEligible() && Halloween::ghostCelebration::PlaySound(self)) return;
+    // Dedicated controller uses a single arrival sting. Suppress repeated
+    // firework booms and legacy ghost moans on rank A+ results.
+    if (Halloween::ghostDrift::IsEligible()) return;
     FireworkGhostAudio(self);
 }
 

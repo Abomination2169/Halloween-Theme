@@ -93,8 +93,8 @@ jobs:
           manifest = json.loads(Path("mod.json").read_text(encoding="utf-8"))
           if manifest.get("id") != "halloween":
               raise SystemExit("Unexpected mod id")
-          if manifest.get("version") != "1.0.1":
-              raise SystemExit("Unexpected v1.0.1 package version")
+          if manifest.get("version") != "1.0.2":
+              raise SystemExit("Unexpected v1.0.2 package version")
           if manifest.get("packageVersion") != "1.40.8_7379":
               raise SystemExit("Manifest no longer targets Beat Saber 1.40.8_7379")
           if manifest.get("modFiles") != ["libhalloween.so"]:
@@ -141,7 +141,7 @@ jobs:
               manifest = json.loads(archive.read("mod.json"))
               if manifest.get("id") != "halloween":
                   raise SystemExit("Unexpected packaged mod id")
-              if manifest.get("version") != "1.0.1":
+              if manifest.get("version") != "1.0.2":
                   raise SystemExit("Unexpected packaged version")
               if manifest.get("packageVersion") != "1.40.8_7379":
                   raise SystemExit("Packaged manifest no longer targets Beat Saber 1.40.8_7379")
@@ -171,7 +171,7 @@ jobs:
                       raise SystemExit(f"Invalid OGG: {name}")
                   if name.endswith(".png") and not data.startswith(b"\x89PNG\r\n\x1a\n"):
                       raise SystemExit(f"Invalid PNG: {name}")
-          print("QMOD validated: v1.0.1, Beat Saber 1.40.8, 12 ghost designs, five sounds and credits.")
+          print("QMOD validated: v1.0.2, Beat Saber 1.40.8, 12 ghost designs, five sounds and credits.")
           PY
 
       - name: Upload build artifact
@@ -181,8 +181,8 @@ jobs:
           path: Halloween-Theme.qmod
           if-no-files-found: error
 
-  publish_v101:
-    name: Publish v1.0.1 on main
+  publish_v102:
+    name: Publish v1.0.2 on main
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-24.04
@@ -203,15 +203,15 @@ jobs:
           from pathlib import Path
           qpm = json.loads(Path("qpm.json").read_text())
           manifest = json.loads(Path("mod.template.json").read_text())
-          assert qpm["info"]["version"] == manifest["version"] == "1.0.1"
+          assert qpm["info"]["version"] == manifest["version"] == "1.0.2"
           assert manifest["packageVersion"] == "1.40.8_7379"
           PY
-          if gh release view v1.0.1 >/dev/null 2>&1; then
-            echo "Release v1.0.1 is already published; refusing to overwrite."
+          if gh release view v1.0.2 >/dev/null 2>&1; then
+            echo "Release v1.0.2 is already published; refusing to overwrite."
             exit 1
           fi
-          if git ls-remote --exit-code --tags origin "refs/tags/v1.0.1"; then
-            echo "Tag v1.0.1 exists without a release; refusing to move it."
+          if git ls-remote --exit-code --tags origin "refs/tags/v1.0.2"; then
+            echo "Tag v1.0.2 exists without a release; refusing to move it."
             exit 1
           fi
 
@@ -230,7 +230,7 @@ jobs:
           with ZipFile("dist/Halloween-Theme.qmod") as package:
               assert package.testzip() is None
               m = json.loads(package.read("mod.json"))
-              assert m["version"] == "1.0.1"
+              assert m["version"] == "1.0.2"
               assert m["packageVersion"] == "1.40.8_7379"
               assert len([p for p in package.namelist() if p.startswith("ghost_extra_") and p.endswith(".png")]) == 4
               for name in ("ghost_ogrebane.ogg", "ghost_scary_1.ogg", "ghost_breath.ogg",
@@ -243,16 +243,16 @@ jobs:
           git archive --format=zip --prefix=Halloween-Theme/ HEAD -o dist/Halloween-Theme-GitHub-Source.zip
           sha256sum dist/Halloween-Theme.qmod dist/Halloween-Theme-GitHub-Source.zip
 
-      - name: Publish verified GitHub Release v1.0.1
+      - name: Publish verified GitHub Release v1.0.2
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v1.0.1 \
+          gh release create v1.0.2 \
             dist/Halloween-Theme.qmod \
             dist/Halloween-Theme-GitHub-Source.zip \
             --target "$GITHUB_SHA" \
-            --title "Halloween Theme v1.0.1 for Beat Saber 1.40.8" \
-            --notes-file RELEASE_NOTES_v1.0.1.md \
+            --title "Halloween Theme v1.0.2 for Beat Saber 1.40.8" \
+            --notes-file RELEASE_NOTES_v1.0.2.md \
             --latest
 
   release:

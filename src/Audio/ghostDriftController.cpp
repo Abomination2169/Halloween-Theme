@@ -151,10 +151,10 @@ namespace Halloween::ghostDrift {
         return resultsVisible && rankEligible && resultsScreen;
     }
 
-    bool Begin(GlobalNamespace::FireworkItemController* firework) {
+    bool Begin() {
         if (!IsEligible()) return false;
         if (root) return true;  // One controller for the current results screen.
-        if (!firework || !LoadSprites()) {
+        if (!LoadSprites()) {
             PaperLogger.info("Dedicated ghosts unavailable; use legacy particles");
             return false;
         }

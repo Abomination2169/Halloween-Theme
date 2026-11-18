@@ -165,17 +165,10 @@ namespace Halloween::ghostDrift {
             return false;
         }
 
-        // Parent to the ResultsViewController itself, not a firework transform.
-        // Fireworks can persist beyond the results screen; the view is the
-        // correct lifetime owner for our sprites.
-        auto* anchor = resultsScreen->get_transform().ptr();
-        if (!anchor) {
-            PaperLogger.info("No results firework parent; use legacy particles");
-            return false;
-        }
-
+        // Keep independent sprites in world space. Parenting them to the
+        // results UI canvas can distort their size and motion. Their lifetime
+        // is explicitly managed by ResultsViewController::DidDeactivate.
         auto* object = GameObject::New_ctor("HalloweenGhostResultsController");
-        object->get_transform()->SetParent(anchor, true);
         auto* camTr = camera->get_transform().ptr();
         const auto cam = camTr->get_position();
         const auto forward = camTr->get_forward();

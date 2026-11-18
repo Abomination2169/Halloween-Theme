@@ -11,7 +11,8 @@ ghost designs and a randomized pool of five eerie sound effects.
 - Every design has equal selection probability.
 - More balanced spawn positions, gentle upward drift, varied left/right
   motion, softened opacity, and cleanup on leaving results.
-- Random ghost voices on approximately 42% of spawns.
+- Ghost sounds play on approximately **42% of spawns**, with the remaining 58% silent.
+- All five loaded sounds rotate in a shuffled cycle, with no repeats until each available track has played and no immediate repeats across cycles when more than one is loaded.
 
 ## Five ghost voices
 - **Ghost** — Ogrebane, CC0.

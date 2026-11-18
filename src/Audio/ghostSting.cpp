@@ -13,6 +13,7 @@
 #include <string>
 #include <array>
 #include <cstdlib>
+#include <utility>
 
 namespace Halloween::ghostSting {
     namespace {
@@ -25,10 +26,8 @@ namespace Halloween::ghostSting {
         bool loading = false;
         bool active = false;
         bool played = false;
-        // Three distinct OpenGameArt recordings: Ogrebane (CC0), Berklee (CC BY 3.0), and qubodup (CC0).
-        // First three recordings are release-cleared OpenGameArt assets.
-        // Final two are OPTIONAL personal Pixabay files: deliberately absent
-        // from the public QMOD manifest pending redistribution clearance.
+        // Five recordings included with the v1.0.1 public QMOD; details and
+        // attribution are in GHOST_AUDIO_CREDITS.txt / PIXABAY_AUDIO_CREDITS.txt.
         const std::array<std::string, 5> voicePaths = {{
             "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_ogrebane.ogg",
             "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_scary_1.ogg",
@@ -38,6 +37,38 @@ namespace Halloween::ghostSting {
         }};
         std::array<UnityEngine::AudioClip*, 5> voiceClips = {nullptr, nullptr, nullptr, nullptr, nullptr};
         bool voiceLoadingStarted = false;
+
+        // Shuffle-bag rotation: each loaded recording plays once per cycle
+        // before any track repeats. Keep the last choice across results screens
+        // to avoid immediately repeating a sound at the cycle boundary.
+        std::array<std::size_t, 5> voiceOrder{};
+        std::size_t voiceOrderLength = 0;
+        std::size_t voiceOrderCursor = 0;
+        int lastVoiceIndex = -1;
+
+        int NextVoiceIndex() {
+            if (voiceOrderCursor >= voiceOrderLength) {
+                voiceOrderLength = 0;
+                voiceOrderCursor = 0;
+                for (std::size_t i = 0; i < voiceClips.size(); ++i) {
+                    if (voiceClips[i]) voiceOrder[voiceOrderLength++] = i;
+                }
+                if (!voiceOrderLength) return -1;
+                // Fisher-Yates shuffle, then avoid a consecutive repeat
+                // across cycles if more than one recording is available.
+                for (std::size_t i = voiceOrderLength; i > 1; --i) {
+                    const std::size_t j = static_cast<std::size_t>(std::rand()) % i;
+                    std::swap(voiceOrder[i - 1], voiceOrder[j]);
+                }
+                if (voiceOrderLength > 1 &&
+                    static_cast<int>(voiceOrder[0]) == lastVoiceIndex) {
+                    std::swap(voiceOrder[0], voiceOrder[1]);
+                }
+            }
+            const int selected = static_cast<int>(voiceOrder[voiceOrderCursor++]);
+            lastVoiceIndex = selected;
+            return selected;
+        }
 
         void LoadOriginalVoices() {
             if (voiceLoadingStarted) return;
@@ -119,19 +150,17 @@ namespace Halloween::ghostSting {
 
     void PlaySpawnVoice(UnityEngine::GameObject* ghost) {
         if (!active || !ghost) return;
-        // Not every ghost speaks; avoid overlapping cartoon voices.
+        // Approximately 42% of spawned ghosts produce a sound.
+        // The other 58% remain silent to prevent a crowded soundscape.
         if (std::rand() % 100 >= 42) return;
-        // Choose uniformly among successfully loaded recordings. A missing
-        // optional clip never reduces the probability of the remaining voices.
-        std::array<UnityEngine::AudioClip*, 5> available{};
-        std::size_t count = 0;
-        for (auto* candidate : voiceClips)
-            if (candidate) available[count++] = candidate;
-        if (!count) return;
-        auto* clip = available[static_cast<std::size_t>(std::rand()) % count];
-        if (!clip) return; // First result may still be loading.
         auto* src = ghost->AddComponent<UnityEngine::AudioSource*>();
         if (!src) return;
+        const int index = NextVoiceIndex();
+        if (index < 0) {
+            UnityEngine::Object::Destroy(src);
+            return;  // No clips loaded yet; never invent a sound.
+        }
+        auto* clip = voiceClips[static_cast<std::size_t>(index)];
         src->set_playOnAwake(false);
         src->set_loop(false);
         src->set_spatialBlend(0.0f);

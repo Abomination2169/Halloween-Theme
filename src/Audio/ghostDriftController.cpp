@@ -93,14 +93,9 @@ namespace {
     bool LoadSprites() {
         if (texturesAttempted) return !spritePool.empty();
         texturesAttempted = true;
-        sprites[0] = BSML::Utilities::LoadSpriteRaw(
-            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_single_0_png));
-        sprites[1] = BSML::Utilities::LoadSpriteRaw(
-            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_single_1_png));
-        sprites[2] = BSML::Utilities::LoadSpriteRaw(
-            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_single_2_png));
-        sprites[3] = BSML::Utilities::LoadSpriteRaw(
-            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_single_3_png));
+        // Retire the initial four ghost drawings from the celebration pool.
+        // Keep their on-disk source/legacy particle atlas for test rollback,
+        // but NEVER select those sprites in this new-artwork-only controller.
         sprites[4] = BSML::Utilities::LoadSpriteRaw(
             static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_0_png));
         sprites[5] = BSML::Utilities::LoadSpriteRaw(
@@ -117,11 +112,11 @@ namespace {
             static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_6_png));
         sprites[11] = BSML::Utilities::LoadSpriteRaw(
             static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_7_png));
-        for (int i = 0; i < 12; ++i) {
+        for (int i = 4; i < 12; ++i) {
             if (!sprites[i]) return false;
             spritePool.push_back(sprites[i]);
         }
-        // Four optional individually packaged test sprites: three new expressions
+        // Four individually packaged test sprites: three approved expressions
         // plus the original shy/peekaboo design. All use the same animation.
         for (int i = 0; i < 4; ++i) {
             sprites[12 + i] = LoadInstalledGhost(i);
@@ -135,7 +130,7 @@ namespace {
                 }
             }
         }
-        PaperLogger.info("Ghost sprite variants available: {}", spritePool.size());
+        PaperLogger.info("New ghost artwork only: 8 embedded + 4 packaged designs (shy ghost weighted); selection entries: {}", spritePool.size());
         return !spritePool.empty();
     }
 
@@ -151,7 +146,7 @@ namespace {
             return;
         }
 
-        // All original and new variants share normalized 256x256 RGBA sprites.
+        // The eight approved newer designs and four extras use 256x256 RGBA sprites.
         // Every ghost picks one independently; never use a UV sprite-sheet animation.
         renderer->set_sprite(spritePool[std::rand() % spritePool.size()]);
         // Higher transparent sorting priority can help against ordinary scene

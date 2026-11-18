@@ -37,10 +37,11 @@ jobs:
           for i in 0 1 2 3; do test -s "assets/ghost_single_$i.png"; done
           for i in 0 1 2 3 4 5 6 7; do test -s "assets/ghost_new_$i.png"; done
 
-      - name: Install build tools
+      - name: Verify runner build tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build unzip curl python3 ffmpeg
+          for executable in cmake ninja unzip curl python3 ffmpeg; do
+            command -v "$executable" || { echo "Missing $executable on Ubuntu runner"; exit 1; }
+          done
 
       - name: Prepare three licensed CC0 Ogrebane ghost sound variants
         run: |

@@ -34,6 +34,34 @@
     {
       "name": "GHOST_AUDIO_CREDITS.txt",
       "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/GHOST_AUDIO_CREDITS.txt"
+    },
+    {
+      "name": "ghost_extra_0.png",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_extra_0.png"
+    },
+    {
+      "name": "ghost_extra_1.png",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_extra_1.png"
+    },
+    {
+      "name": "ghost_extra_2.png",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_extra_2.png"
+    },
+    {
+      "name": "ghost_extra_3.png",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_extra_3.png"
+    },
+    {
+      "name": "ghost_pixabay_creepy.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_pixabay_creepy.ogg"
+    },
+    {
+      "name": "ghost_pixabay_wind.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_pixabay_wind.ogg"
+    },
+    {
+      "name": "PIXABAY_AUDIO_CREDITS.txt",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/PIXABAY_AUDIO_CREDITS.txt"
     }
   ]
 }

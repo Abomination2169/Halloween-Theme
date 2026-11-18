@@ -125,7 +125,15 @@ namespace {
         // plus the original shy/peekaboo design. All use the same animation.
         for (int i = 0; i < 4; ++i) {
             sprites[12 + i] = LoadInstalledGhost(i);
-            if (sprites[12 + i]) spritePool.push_back(sprites[12 + i]);
+            if (sprites[12 + i]) {
+                spritePool.push_back(sprites[12 + i]);
+                // Give the user-selected shy/peekaboo ghost a better chance
+                // of appearing during a short results celebration.
+                if (i == 3) {
+                    spritePool.push_back(sprites[12 + i]);
+                    spritePool.push_back(sprites[12 + i]);
+                }
+            }
         }
         PaperLogger.info("Ghost sprite variants available: {}", spritePool.size());
         return !spritePool.empty();

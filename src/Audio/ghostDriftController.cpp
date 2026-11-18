@@ -254,9 +254,9 @@ namespace Halloween::ghostDrift {
         resultsVisible = (results != nullptr);
         rankEligible = resultsVisible && eligible;
         if (rankEligible) {
-            PaperLogger.info("Ghost results: rank A or above, enabled");
+            PaperLogger.info("Ghost results: rank S or above, enabled");
         } else {
-            PaperLogger.info("Ghost results: below A or inactive, disabled");
+            PaperLogger.info("Ghost results: below S or inactive, disabled");
         }
     }
 

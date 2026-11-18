@@ -1,30 +1,28 @@
-# Original cartoon ghost sound effects — Halloween Theme
+# Halloween Ghost SFX — CC0 source and redistribution
 
-The three files `ghost_original_woo.ogg`, `ghost_original_eww.ogg`, and
-`ghost_original_oooo.ogg` are original audio created by procedural synthesis
-for the Halloween Theme Beat Saber mod. The source generator is
-`scripts/generate_original_ghost_sfx.py`.
+**Recording:** "Ghost" by Ogrebane, published 17 December 2010.
+**Source:** https://opengameart.org/content/ghost
+**Original file:** https://opengameart.org/sites/default/files/ghost.wav
+**License on source page:** Creative Commons Zero (CC0)
+**License terms:** https://creativecommons.org/publicdomain/zero/1.0/
 
-## Distribution permission
-These recordings contain newly synthesized oscillators and noise only. No
-third-party sound recordings, samples, purchased sound packs, copyrighted
-music, or imitation of identifiable recordings were used.
+The files `ghost_cc0_ogrebane_original.ogg`,
+`ghost_cc0_ogrebane_lower.ogg`, and
+`ghost_cc0_ogrebane_higher.ogg` are the original recording converted to
+OGG, plus two subtly pitch-shifted/delayed variants.
 
-The project maintainer may use, copy, bundle, adapt, modify and publicly
-redistribute these three generated sound recordings in the Halloween Theme
-project (including free or paid releases) without fee or required credit.
-Credit such as "Original synthesized cartoon ghost SFX — Halloween Theme"
-is optional. The reproducible generator is provided as source.
+CC0 permits copying, modification and redistribution, including as
+extractable audio assets inside a publicly distributed Beat Saber QMOD.
+Attribution is not legally required but is retained here as good practice.
 
-This permission applies **only** to the three original generated recordings.
-It does not establish rights for the separately sourced Uppbeat "Halloween
-Music Sting" or the legacy menu soundtrack. **Do not include the Uppbeat
-recording in a public package** without separate written redistribution
-permission. The optional personal-only file `ghost_celebration_sting.ogg`
-is not part of `mod.template.json`.
+**These are NOT original recordings made by the Halloween Theme mod
+developer.** The source is Ogrebane's CC0 work, and the build script
+downloads it afresh from the direct OpenGameArt attachment. If that download
+is unavailable, the build fails rather than replacing it silently.
 
-## Behavior
-On rank A or better, a random voice can be played on a subset of newly
-spawned ghosts, with no loop. The sound emitter is destroyed when the results
-screen closes. The optional independently licensed one-time music sting can
-still be installed for private testing.
+This license information applies ONLY to the three Ogrebane-derived sounds.
+It does not apply to the separately licensed Uppbeat music sting or to other
+soundtracks included in this repository. Those must be reviewed separately.
+
+If bundled as part of a release, include this text in the source/release
+notes to preserve provenance.

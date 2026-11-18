@@ -122,15 +122,9 @@ namespace {
             sprites[12 + i] = LoadInstalledGhost(i);
             if (sprites[12 + i]) {
                 spritePool.push_back(sprites[12 + i]);
-                // Give the user-selected shy/peekaboo ghost a better chance
-                // of appearing during a short results celebration.
-                if (i == 3) {
-                    spritePool.push_back(sprites[12 + i]);
-                    spritePool.push_back(sprites[12 + i]);
-                }
             }
         }
-        PaperLogger.info("New ghost artwork only: 8 embedded + 4 packaged designs (shy ghost weighted); selection entries: {}", spritePool.size());
+        PaperLogger.info("New ghost artwork only: 8 embedded + 4 packaged designs; selection entries: {}", spritePool.size());
         return !spritePool.empty();
     }
 

@@ -10,6 +10,7 @@ on:
       - feature/ghost-dispersion-original-sfx-1.40.8
       - feature/ghost-art-variety-1.40.8
       - feature/ghost-variety-final-four-1.40.8
+      - feature/new-ghosts-only-1.40.8
     tags:
       - "v*"
   pull_request:

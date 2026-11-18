@@ -11,6 +11,8 @@
 
 #include <functional>
 #include <string>
+#include <array>
+#include <cstdlib>
 
 namespace Halloween::ghostSting {
     namespace {
@@ -23,6 +25,35 @@ namespace Halloween::ghostSting {
         bool loading = false;
         bool active = false;
         bool played = false;
+        // These three original synthesized voices are bundled with the QMOD.
+        const std::array<std::string, 3> voicePaths = {{
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_original_woo.ogg",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_original_eww.ogg",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_original_oooo.ogg"
+        }};
+        std::array<UnityEngine::AudioClip*, 3> voiceClips = {nullptr, nullptr, nullptr};
+        bool voiceLoadingStarted = false;
+
+        void LoadOriginalVoices() {
+            if (voiceLoadingStarted) return;
+            voiceLoadingStarted = true;
+            for (std::size_t i = 0; i < voicePaths.size(); ++i) {
+                if (!fileexists(voicePaths[i])) {
+                    PaperLogger.info("Original ghost sound missing: {}", voicePaths[i]);
+                    continue;
+                }
+                auto task = GlobalNamespace::MediaAsyncLoader::New_ctor()
+                    ->LoadAudioClipFromFilePathAsync(voicePaths[i]);
+                task->GetAwaiter().OnCompleted(
+                    custom_types::MakeDelegate<System::Action*>(
+                        std::function([task, i]() {
+                            auto clip = task->get_Result();
+                            if (clip) voiceClips[i] = clip.ptr();
+                        }))
+                );
+            }
+        }
+
 
         void PlayLoadedOnce() {
             if (!active || played || !host || !cachedClip) return;
@@ -62,6 +93,7 @@ namespace Halloween::ghostSting {
         ExitResults();
         active = true;
         played = false;
+        LoadOriginalVoices();
         if (!fileexists(path)) {
             PaperLogger.info("Optional ghost sting not installed; visuals unaffected");
             return;
@@ -78,6 +110,27 @@ namespace Halloween::ghostSting {
         src->set_loop(false);
         if (cachedClip) PlayLoadedOnce();
         else RequestClip();
+    }
+
+    void PlaySpawnVoice(UnityEngine::GameObject* ghost) {
+        if (!active || !ghost) return;
+        // Not every ghost speaks; avoid overlapping cartoon voices.
+        if (std::rand() % 100 >= 42) return;
+        const std::size_t start = static_cast<std::size_t>(std::rand()) % voiceClips.size();
+        UnityEngine::AudioClip* clip = nullptr;
+        for (std::size_t i = 0; i < voiceClips.size(); ++i) {
+            auto* candidate = voiceClips[(start + i) % voiceClips.size()];
+            if (candidate) { clip = candidate; break; }
+        }
+        if (!clip) return; // First result may still be loading.
+        auto* src = ghost->AddComponent<UnityEngine::AudioSource*>();
+        if (!src) return;
+        src->set_playOnAwake(false);
+        src->set_loop(false);
+        src->set_spatialBlend(0.0f);
+        src->set_volume(0.38f);
+        src->set_clip(clip);
+        src->Play();
     }
 
     void ExitResults() {

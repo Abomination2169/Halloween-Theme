@@ -95,12 +95,12 @@ MAKE_HOOK_MATCH(HalloweenGhostResultsDidActivate, &GlobalNamespace::ResultsViewC
     GlobalNamespace::ResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     HalloweenGhostResultsDidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     auto* completed = self ? self->__cordl_internal_get__levelCompletionResults() : nullptr;
-    const bool rankAOrAbove = completed && completed->__cordl_internal_get_rank().value__ >= 4;
-    Halloween::ghostDrift::SetResultsScreen(self, rankAOrAbove);
+    const bool rankSOrAbove = completed && completed->__cordl_internal_get_rank().value__ >= 5;
+    Halloween::ghostDrift::SetResultsScreen(self, rankSOrAbove);
     // FireworkItemController::InitializeParticleSystem commonly runs before
     // the results screen opens. Starting only from that hook made A/S blank.
     // Start independently from the results-screen lifecycle instead.
-    if (rankAOrAbove) {
+    if (rankSOrAbove) {
         Halloween::ghostSting::EnterResults();
         if (!Halloween::ghostDrift::Begin()) {
             PaperLogger.info("Results ghost controller could not initialize");
@@ -129,7 +129,7 @@ MAKE_HOOK_MATCH(FireworkGhostParticles, &GlobalNamespace::FireworkItemController
             }
         }
     } else if (Halloween::ghostDrift::IsEligible()) {
-        // For rank A+ only: keep the old implementation as a fallback if
+        // For rank S+ only: keep the old implementation as a fallback if
         // the dedicated ghost controller cannot start.
         Halloween::ghostCelebration::ApplyGhostParticles(self);
     }
@@ -137,7 +137,7 @@ MAKE_HOOK_MATCH(FireworkGhostParticles, &GlobalNamespace::FireworkItemController
 
 MAKE_HOOK_MATCH(FireworkGhostAudio, &GlobalNamespace::FireworkItemController::PlayExplosionSound, void, GlobalNamespace::FireworkItemController* self) {
     // Dedicated controller uses a single arrival sting. Suppress repeated
-    // firework booms and legacy ghost moans on rank A+ results.
+    // firework booms and legacy ghost moans on rank S+ results.
     if (Halloween::ghostDrift::IsEligible()) return;
     FireworkGhostAudio(self);
 }

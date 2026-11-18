@@ -63,7 +63,7 @@ namespace {
         if (root) UnityEngine::Object::Destroy(root.ptr());
         root = nullptr;
     }
-    std::array<Sprite*, 4> sprites = {nullptr, nullptr, nullptr, nullptr};
+    std::array<Sprite*, 12> sprites = {};
     bool texturesAttempted = false;
 
     float Random01() {
@@ -88,6 +88,22 @@ namespace {
             static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_single_2_png));
         sprites[3] = BSML::Utilities::LoadSpriteRaw(
             static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_single_3_png));
+        sprites[4] = BSML::Utilities::LoadSpriteRaw(
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_0_png));
+        sprites[5] = BSML::Utilities::LoadSpriteRaw(
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_1_png));
+        sprites[6] = BSML::Utilities::LoadSpriteRaw(
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_2_png));
+        sprites[7] = BSML::Utilities::LoadSpriteRaw(
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_3_png));
+        sprites[8] = BSML::Utilities::LoadSpriteRaw(
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_4_png));
+        sprites[9] = BSML::Utilities::LoadSpriteRaw(
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_5_png));
+        sprites[10] = BSML::Utilities::LoadSpriteRaw(
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_6_png));
+        sprites[11] = BSML::Utilities::LoadSpriteRaw(
+            static_cast<ArrayW<uint8_t>>(IncludedAssets::ghost_new_7_png));
         for (auto* sprite : sprites) if (!sprite) return false;
         return true;
     }
@@ -104,6 +120,8 @@ namespace {
             return;
         }
 
+        // Original four and eight additional designs share normalized 256x256 RGBA sprites.
+        // Every ghost picks one independently; never use a UV sprite-sheet animation.
         renderer->set_sprite(sprites[std::rand() % sprites.size()]);
         // Higher transparent sorting priority can help against ordinary scene
         // SpriteRenderers, but not necessarily screen-space UI canvases.

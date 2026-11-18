@@ -92,7 +92,7 @@ namespace {
     }
 
     void SpawnGhost(int sequence) {
-        if (!root || active.size() >= 6) return;
+        if (!root || active.size() >= 5) return;
 
         auto* go = GameObject::New_ctor("HalloweenIndependentGhost");
         auto* tr = go->get_transform().ptr();
@@ -115,10 +115,14 @@ namespace {
             startY = Between(-1.65f, 0.35f);
             bool overlapping = false;
             for (const auto& earlier : active) {
-                if (earlier.age > 2.0f) continue;
-                const float dx = startX - earlier.startX;
-                const float dy = startY - earlier.startY;
-                if (dx * dx + dy * dy < 1.35f * 1.35f) {
+                if (earlier.age > 4.0f) continue;
+                const float ex = earlier.startX + earlier.driftX * earlier.age
+                    + std::sin(earlier.wavePhase + earlier.age * earlier.waveSpeed)
+                      * earlier.waveWidth;
+                const float ey = earlier.startY + earlier.riseSpeed * earlier.age;
+                const float dx = startX - ex;
+                const float dy = startY - ey;
+                if (dx * dx + dy * dy < 1.0f * 1.0f) {
                     overlapping = true;
                     break;
                 }
@@ -129,7 +133,9 @@ namespace {
         // Sine-wave motion below adds subtle, non-linear floating on top.
         const float driftX = (Random01() < 0.5f ? -1.0f : 1.0f)
             * Between(0.05f, 0.16f);
-        float scale = Between(1.15f, 1.65f);
+        // The originals rendered like huge cut-outs at 1.15-1.65 scale.
+        // Reduce to ~30% of their former apparent size.
+        float scale = Between(0.36f, 0.49f);
         tr->set_localScale(Vector3(scale, scale, 1.0f));
         tr->set_localPosition(Vector3(startX, startY, 0.0f));
         tr->set_localRotation(UnityEngine::Quaternion::get_identity());
@@ -244,7 +250,7 @@ void Halloween::GhostDriftController::Update() {
         float t = ghost.age / ghost.lifetime;
         float fadeIn = std::min(1.0f, ghost.age / 0.9f);
         float fadeOut = std::min(1.0f, (ghost.lifetime - ghost.age) / 1.7f);
-        float alpha = 0.69f * std::min(fadeIn, fadeOut);
+        float alpha = 0.48f * std::min(fadeIn, fadeOut);
         float sway = std::sin(ghost.wavePhase + ghost.age * ghost.waveSpeed)
                      * ghost.waveWidth;
         auto* tr = ghost.gameObject->get_transform().ptr();

@@ -4,6 +4,7 @@
 #include "logging.hpp"
 #include "bsml/shared/Helpers/utilities.hpp"
 #include "GlobalNamespace/FireworkItemController.hpp"
+#include "GlobalNamespace/ResultsViewController.hpp"
 #include "UnityEngine/Camera.hpp"
 #include "UnityEngine/Color.hpp"
 #include "UnityEngine/GameObject.hpp"
@@ -46,6 +47,20 @@ namespace {
 
     std::vector<ActiveGhost> active;
     SafePtrUnity<GameObject> root;
+    SafePtrUnity<GlobalNamespace::ResultsViewController> resultsScreen;
+    bool resultsVisible = false;
+    bool rankEligible = false;
+
+    void ClearGhosts() {
+        // Destroy the renderers immediately from our tracking set; the GameObjects
+        // are destroyed by Unity at the end of the frame.
+        for (auto& ghost : active) {
+            if (ghost.gameObject) UnityEngine::Object::Destroy(ghost.gameObject);
+        }
+        active.clear();
+        if (root) UnityEngine::Object::Destroy(root.ptr());
+        root = nullptr;
+    }
     std::array<Sprite*, 4> sprites = {nullptr, nullptr, nullptr, nullptr};
     bool texturesAttempted = false;
 
@@ -110,8 +125,35 @@ namespace {
 }
 
 namespace Halloween::ghostDrift {
+    void EndResultsScreen() {
+        // Called for every exit, including Continue, Restart and navigation
+        // away. Never allow ghosts to survive into the menu or next song.
+        resultsVisible = false;
+        rankEligible = false;
+        resultsScreen = nullptr;
+        ClearGhosts();
+    }
+
+    void SetResultsScreen(GlobalNamespace::ResultsViewController* results, bool eligible) {
+        // The previous results may still have been in the Unity destroy queue.
+        ClearGhosts();
+        resultsScreen = results;
+        resultsVisible = (results != nullptr);
+        rankEligible = resultsVisible && eligible;
+        if (rankEligible) {
+            PaperLogger.info("Ghost results: rank A or above, enabled");
+        } else {
+            PaperLogger.info("Ghost results: below A or inactive, disabled");
+        }
+    }
+
+    bool IsEligible() {
+        return resultsVisible && rankEligible && resultsScreen;
+    }
+
     bool Begin(GlobalNamespace::FireworkItemController* firework) {
-        if (root) return true;  // One controller for the results screen.
+        if (!IsEligible()) return false;
+        if (root) return true;  // One controller for the current results screen.
         if (!firework || !LoadSprites()) {
             PaperLogger.info("Dedicated ghosts unavailable; use legacy particles");
             return false;
@@ -123,7 +165,10 @@ namespace Halloween::ghostDrift {
             return false;
         }
 
-        auto* anchor = firework->get_transform()->get_parent().ptr();
+        // Parent to the ResultsViewController itself, not a firework transform.
+        // Fireworks can persist beyond the results screen; the view is the
+        // correct lifetime owner for our sprites.
+        auto* anchor = resultsScreen->get_transform().ptr();
         if (!anchor) {
             PaperLogger.info("No results firework parent; use legacy particles");
             return false;
@@ -158,6 +203,10 @@ namespace Halloween::ghostDrift {
 }
 
 void Halloween::GhostDriftController::Update() {
+    if (!Halloween::ghostDrift::IsEligible()) {
+        ClearGhosts();
+        return;
+    }
     float dt = std::min(UnityEngine::Time::get_deltaTime(), 0.1f);
     if (dt <= 0.0f) return;
 
@@ -201,6 +250,9 @@ void Halloween::GhostDriftController::Update() {
 }
 
 void Halloween::GhostDriftController::OnDestroy() {
-    active.clear(); // Child ghosts are destroyed with their results parent.
-    root = nullptr;
+    // Parent/results deactivation might already have cleared everything.
+    // Only clear the active root: a later results screen could be alive.
+    if (root && root.ptr() == this->get_gameObject().ptr()) {
+        ClearGhosts();
+    }
 }

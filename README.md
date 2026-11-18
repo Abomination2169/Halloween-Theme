@@ -15,23 +15,6 @@ Note: Development assisted with use of A.I. Please support talented artists and 
 
 **Compatible with:** Beat Saber 1.40.8 (Quest)
 
-### Halloween Theme v1.0.1 — Ghost celebration
-
-After completing a song with **rank S, SS or SSS**, twelve individually
-randomized ghosts drift upward around the results screen, paired with a
-five-sound randomized ghost-effect pool. Rank A or below does not trigger
-the celebration. All ghosts disappear upon leaving results.
-
-The v1.0.1 QMOD bundles the four additional transparent ghost PNGs and all
-five effects; installation requires only QuestPatcher. The shy/peekaboo ghost
-has the same selection weight as the other designs.
-
-Please see [v1.0.1 release notes](RELEASE_NOTES_v1.0.1.md) and
-[third-party notices](THIRD_PARTY_NOTICES.md) for credits and licensing.
-The two DRAGON-STUDIO effects are part of the interactive mod, not a
-standalone sound collection. Do not extract and redistribute them separately.
-
-
 ## License and source code
 
 See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for detailed attribution, audio licensing, and artwork provenance.
@@ -39,6 +22,11 @@ See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for detailed attribution, a
 This project is a modified derivative of [Christmas Theme](https://github.com/vcmikuu/ChristmasTheme), created by **Vcmikuu** and **CatsaCode**. It contains modified Christmas Theme code alongside new seasonal modifications. The original developers have [authorized reuse under GNU GPL version 3 with proper credit](https://github.com/vcmikuu/ChristmasTheme/issues/1#issuecomment-6711835142).
 
 The combined mod's code is distributed under the **GNU General Public License, version 3 (GPL-3.0-only)**. See the [LICENSE](LICENSE) file for the complete terms. You may study, modify, and redistribute the covered code under GPLv3, subject to its requirements. This is not an official release by the Christmas Theme developers.
+
+Please see [v1.0.1 release notes](RELEASE_NOTES_v1.0.1.md) and
+[third-party notices](THIRD_PARTY_NOTICES.md) for credits and licensing.
+The two DRAGON-STUDIO effects are part of the interactive mod, not a
+standalone sound collection. Do not extract and redistribute them separately.
 
 **Source and binaries:** The [GitHub repository](https://github.com/Abomination2169/Halloween-Theme) contains the mod's source and build configuration; the [releases page](https://github.com/Abomination2169/Halloween-Theme/releases) provides downloadable QMODs and source archives. For each binary release, use the matching version/tag of the source, not necessarily the latest `main` branch. The source supplied for a QMOD must correspond to that build; release assets and source archives require review to confirm this.
 

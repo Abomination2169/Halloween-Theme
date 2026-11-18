@@ -1,4 +1,5 @@
 #include "Audio/ghostDriftController.hpp"
+#include "Audio/ghostSting.hpp"
 
 #include "assets.hpp"
 #include "logging.hpp"
@@ -187,6 +188,7 @@ namespace {
         tr->set_localRotation(UnityEngine::Quaternion::get_identity());
         renderer->set_color(UnityEngine::Color(0.90f, 0.95f, 1.0f, 0.0f));
 
+        Halloween::ghostSting::PlaySpawnVoice(go);
         active.push_back({
             go, renderer, 0.0f,
             Between(7.0f, 9.5f), startX, startY, driftX,

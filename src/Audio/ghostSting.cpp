@@ -25,11 +25,11 @@ namespace Halloween::ghostSting {
         bool loading = false;
         bool active = false;
         bool played = false;
-        // These three original synthesized voices are bundled with the QMOD.
+        // These three CC0 recordings are derived from Ogrebane's Ghost on OpenGameArt.
         const std::array<std::string, 3> voicePaths = {{
-            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_original_woo.ogg",
-            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_original_eww.ogg",
-            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_original_oooo.ogg"
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cc0_ogrebane_original.ogg",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cc0_ogrebane_lower.ogg",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cc0_ogrebane_higher.ogg"
         }};
         std::array<UnityEngine::AudioClip*, 3> voiceClips = {nullptr, nullptr, nullptr};
         bool voiceLoadingStarted = false;

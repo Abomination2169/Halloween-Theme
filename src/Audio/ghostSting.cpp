@@ -26,12 +26,17 @@ namespace Halloween::ghostSting {
         bool active = false;
         bool played = false;
         // Three distinct OpenGameArt recordings: Ogrebane (CC0), Berklee (CC BY 3.0), and qubodup (CC0).
-        const std::array<std::string, 3> voicePaths = {{
+        // First three recordings are release-cleared OpenGameArt assets.
+        // Final two are OPTIONAL personal Pixabay files: deliberately absent
+        // from the public QMOD manifest pending redistribution clearance.
+        const std::array<std::string, 5> voicePaths = {{
             "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_ogrebane.ogg",
             "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_scary_1.ogg",
-            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_breath.ogg"
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_breath.ogg",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_pixabay_creepy.ogg",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_pixabay_wind.ogg"
         }};
-        std::array<UnityEngine::AudioClip*, 3> voiceClips = {nullptr, nullptr, nullptr};
+        std::array<UnityEngine::AudioClip*, 5> voiceClips = {nullptr, nullptr, nullptr, nullptr, nullptr};
         bool voiceLoadingStarted = false;
 
         void LoadOriginalVoices() {
@@ -116,12 +121,14 @@ namespace Halloween::ghostSting {
         if (!active || !ghost) return;
         // Not every ghost speaks; avoid overlapping cartoon voices.
         if (std::rand() % 100 >= 42) return;
-        const std::size_t start = static_cast<std::size_t>(std::rand()) % voiceClips.size();
-        UnityEngine::AudioClip* clip = nullptr;
-        for (std::size_t i = 0; i < voiceClips.size(); ++i) {
-            auto* candidate = voiceClips[(start + i) % voiceClips.size()];
-            if (candidate) { clip = candidate; break; }
-        }
+        // Choose uniformly among successfully loaded recordings. A missing
+        // optional clip never reduces the probability of the remaining voices.
+        std::array<UnityEngine::AudioClip*, 5> available{};
+        std::size_t count = 0;
+        for (auto* candidate : voiceClips)
+            if (candidate) available[count++] = candidate;
+        if (!count) return;
+        auto* clip = available[static_cast<std::size_t>(std::rand()) % count];
         if (!clip) return; // First result may still be loading.
         auto* src = ghost->AddComponent<UnityEngine::AudioSource*>();
         if (!src) return;

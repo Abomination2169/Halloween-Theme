@@ -3,7 +3,7 @@
 #include "custom-types/shared/macros.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
 
-namespace GlobalNamespace { class FireworkItemController; }
+namespace GlobalNamespace { class FireworkItemController; class ResultsViewController; }
 
 DECLARE_CLASS_CODEGEN(Halloween, GhostDriftController, UnityEngine::MonoBehaviour) {
     DECLARE_INSTANCE_METHOD(void, Update);
@@ -16,5 +16,8 @@ DECLARE_CLASS_CODEGEN(Halloween, GhostDriftController, UnityEngine::MonoBehaviou
 namespace Halloween::ghostDrift {
     // Called from the existing 1.40.8 results-firework initialization hook.
     // Returns false if no camera/sprites are ready, allowing legacy fallback.
+    void SetResultsScreen(GlobalNamespace::ResultsViewController* results, bool eligible);
+    void EndResultsScreen();
+    bool IsEligible();
     bool Begin(GlobalNamespace::FireworkItemController* firework);
 }

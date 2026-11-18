@@ -6,6 +6,7 @@ on:
       - main
       - feature/ghost-results-1.40.8
       - feature/dedicated-ghost-controller-1.40.8
+      - feature/original-artwork-ghost-controller-1.40.8
     tags:
       - "v*"
   pull_request:

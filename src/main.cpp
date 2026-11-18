@@ -96,6 +96,14 @@ MAKE_HOOK_MATCH(HalloweenGhostResultsDidActivate, &GlobalNamespace::ResultsViewC
     auto* completed = self ? self->__cordl_internal_get__levelCompletionResults() : nullptr;
     const bool rankAOrAbove = completed && completed->__cordl_internal_get_rank().value__ >= 4;
     Halloween::ghostDrift::SetResultsScreen(self, rankAOrAbove);
+    // FireworkItemController::InitializeParticleSystem commonly runs before
+    // the results screen opens. Starting only from that hook made A/S blank.
+    // Start independently from the results-screen lifecycle instead.
+    if (rankAOrAbove) {
+        if (!Halloween::ghostDrift::Begin()) {
+            PaperLogger.info("Results ghost controller could not initialize");
+        }
+    }
 }
 
 MAKE_HOOK_MATCH(HalloweenGhostResultsDidDeactivate, &GlobalNamespace::ResultsViewController::DidDeactivate, void,
@@ -109,7 +117,7 @@ MAKE_HOOK_MATCH(FireworkGhostParticles, &GlobalNamespace::FireworkItemController
     FireworkGhostParticles(self);
     // The new controller lives under the results environment, with its own
     // Unity Update lifecycle. No reliance on the short firework burst duration.
-    if (Halloween::ghostDrift::Begin(self)) {
+    if (Halloween::ghostDrift::Begin()) {
         if (self && self->_particleSystems) {
             for (auto* entry : self->_particleSystems) {
                 if (!entry || !entry->_particleSystem) continue;

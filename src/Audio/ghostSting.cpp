@@ -25,11 +25,11 @@ namespace Halloween::ghostSting {
         bool loading = false;
         bool active = false;
         bool played = false;
-        // These three CC0 recordings are derived from Ogrebane's Ghost on OpenGameArt.
+        // Three distinct OpenGameArt recordings: Ogrebane (CC0), Berklee (CC BY 3.0), and qubodup (CC0).
         const std::array<std::string, 3> voicePaths = {{
-            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cc0_ogrebane_original.ogg",
-            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cc0_ogrebane_lower.ogg",
-            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_cc0_ogrebane_higher.ogg"
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_ogrebane.ogg",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_scary_1.ogg",
+            "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_breath.ogg"
         }};
         std::array<UnityEngine::AudioClip*, 3> voiceClips = {nullptr, nullptr, nullptr};
         bool voiceLoadingStarted = false;

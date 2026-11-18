@@ -33,9 +33,6 @@ jobs:
           test -s assets/ghost_sprites.png
           for i in 0 1 2 3; do test -s "assets/ghost_single_$i.png"; done
 
-      - name: Audit source configuration and package metadata
-        run: python3 scripts/audit-source.py
-
       - name: Install build tools
         run: |
           sudo apt-get update
@@ -47,6 +44,9 @@ jobs:
           for name in ghost_original_woo ghost_original_eww ghost_original_oooo; do
             test -s "FileCopies/$name.ogg"
           done
+
+      - name: Audit source configuration and package metadata
+        run: python3 scripts/audit-source.py
 
       - name: Install QPM CLI
         env:

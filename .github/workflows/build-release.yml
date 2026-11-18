@@ -9,6 +9,7 @@ on:
       - feature/original-artwork-ghost-controller-1.40.8
       - feature/ghost-dispersion-original-sfx-1.40.8
       - feature/ghost-art-variety-1.40.8
+      - feature/ghost-variety-final-four-1.40.8
     tags:
       - "v*"
   pull_request:

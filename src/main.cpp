@@ -17,6 +17,9 @@
 
 #include "Audio/player.hpp"
 #include "Audio/ghostCelebration.hpp"
+#include "Audio/ghostDriftController.hpp"
+#include "AutumnLeaves/particleController.hpp"
+#include "custom-types/shared/register.hpp"
 #include "GlobalNamespace/FireworkItemController.hpp"
 
 #include "GlobalNamespace/SongPreviewPlayer.hpp"
@@ -86,7 +89,20 @@ MAKE_HOOK_MATCH(SongPreviewPlayer_CrossfadeTo, static_cast<void(SongPreviewPlaye
 // Results-screen celebration: replace firework particles and their explosion sound.
 MAKE_HOOK_MATCH(FireworkGhostParticles, &GlobalNamespace::FireworkItemController::InitializeParticleSystem, void, GlobalNamespace::FireworkItemController* self) {
     FireworkGhostParticles(self);
-    Halloween::ghostCelebration::ApplyGhostParticles(self);
+    // The new controller lives under the results environment, with its own
+    // Unity Update lifecycle. No reliance on the short firework burst duration.
+    if (Halloween::ghostDrift::Begin(self)) {
+        if (self && self->_particleSystems) {
+            for (auto* entry : self->_particleSystems) {
+                if (!entry || !entry->_particleSystem) continue;
+                Flair::ParticleController::EmissionModule::set_enabled(
+                    entry->_particleSystem.ptr(), false);
+            }
+        }
+    } else {
+        // Keep the old verified behavior if camera/sprites are unavailable.
+        Halloween::ghostCelebration::ApplyGhostParticles(self);
+    }
 }
 
 MAKE_HOOK_MATCH(FireworkGhostAudio, &GlobalNamespace::FireworkItemController::PlayExplosionSound, void, GlobalNamespace::FireworkItemController* self) {
@@ -219,6 +235,7 @@ MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
 // Called later on in the game loading - a good time to install function hooks
 MOD_EXTERN_FUNC void late_load() noexcept {
     il2cpp_functions::Init();
+    custom_types::Register::AutoRegister();
 
 
     INFO("Installing hooks...");

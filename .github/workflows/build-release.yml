@@ -168,7 +168,7 @@ jobs:
                       raise SystemExit(f"Invalid asset: {name}")
                   if name.endswith(".ogg") and not data.startswith(b"OggS"):
                       raise SystemExit(f"Invalid OGG: {name}")
-                  if name.endswith(".png") and not data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+                  if name.endswith(".png") and not data.startswith(b"\x89PNG\r\n\x1a\n"):
                       raise SystemExit(f"Invalid PNG: {name}")
           print("QMOD validated: v1.0.1, Beat Saber 1.40.8, 12 ghost designs, five sounds and credits.")
           PY

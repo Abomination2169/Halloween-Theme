@@ -26,7 +26,7 @@ namespace Halloween::ghostSting {
         bool loading = false;
         bool active = false;
         bool played = false;
-        // Five recordings included with the v1.0.1 public QMOD; details and
+        // Five recordings included with the v1.0.2 public QMOD; details and
         // attribution are in GHOST_AUDIO_CREDITS.txt / PIXABAY_AUDIO_CREDITS.txt.
         const std::array<std::string, 5> voicePaths = {{
             "/sdcard/ModData/com.beatgames.beatsaber/Mods/Halloween/ghost_ogrebane.ogg",

@@ -14,6 +14,7 @@ on:
       - feature/three-ghost-voices-1.40.8
       - feature/five-ghost-sounds-personal-1.40.8
       - release/v1.0.1-s-rank
+      - fix/v1.0.1-ghost-sound-rotation-and-png-cleanup
     tags:
       - "v*"
   pull_request:
@@ -181,8 +182,8 @@ jobs:
           if-no-files-found: error
 
   publish_v101:
-    name: Publish v1.0.1 on main
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Replace v1.0.1 assets with corrected source and QMOD
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[publish-corrected-v1.0.1]')
     needs: build
     runs-on: ubuntu-24.04
     permissions:
@@ -193,7 +194,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Verify intended release and no previous published tag
+      - name: Verify v1.0.1 metadata and existing release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -204,15 +205,12 @@ jobs:
           manifest = json.loads(Path("mod.template.json").read_text())
           assert qpm["info"]["version"] == manifest["version"] == "1.0.1"
           assert manifest["packageVersion"] == "1.40.8_7379"
+          assert Path("Cover.png").is_file(), "MBF cover missing"
+          assert Path("RELEASE_NOTES_v1.0.1.md").is_file()
           PY
-          if gh release view v1.0.1 >/dev/null 2>&1; then
-            echo "Release v1.0.1 is already published; refusing to overwrite."
-            exit 1
-          fi
-          if git ls-remote --exit-code --tags origin "refs/tags/v1.0.1"; then
-            echo "Tag v1.0.1 exists without a release; refusing to move it."
-            exit 1
-          fi
+          gh release view v1.0.1 >/dev/null
+          git ls-remote --exit-code --tags origin "refs/tags/v1.0.1"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
 
       - name: Download exact QMOD artifact from this workflow
         uses: actions/download-artifact@v4
@@ -242,17 +240,26 @@ jobs:
           git archive --format=zip --prefix=Halloween-Theme/ HEAD -o dist/Halloween-Theme-GitHub-Source.zip
           sha256sum dist/Halloween-Theme.qmod dist/Halloween-Theme-GitHub-Source.zip
 
-      - name: Publish verified GitHub Release v1.0.1
+      - name: Update existing v1.0.1 release with matching source and QMOD
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v1.0.1 \
+          set -euo pipefail
+          # User explicitly requested keeping v1.0.1. Move the existing
+          # v1.0.1 tag to these corrected, tested sources, then replace both
+          # published artifacts together. Never rename the manifest version.
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/v1.0.1" \
+            -f sha="$GITHUB_SHA" -F force=true \
+            --jq '.object.sha'
+          gh release upload v1.0.1 \
             dist/Halloween-Theme.qmod \
             dist/Halloween-Theme-GitHub-Source.zip \
-            --target "$GITHUB_SHA" \
+            --clobber
+          gh release edit v1.0.1 \
             --title "Halloween Theme v1.0.1 for Beat Saber 1.40.8" \
             --notes-file RELEASE_NOTES_v1.0.1.md \
             --latest
+          gh release view v1.0.1 --json tagName,assets --jq '.tagName, (.assets[] | .name)'
 
   release:
     name: Publish tagged release

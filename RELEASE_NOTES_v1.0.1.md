@@ -1,25 +1,44 @@
 # Halloween Theme v1.0.1 — Beat Saber Quest 1.40.8
 
-## Changes
-- The results-screen ghost celebration now triggers **only with rank S, SS or SSS**. Rank A or below does not produce celebration ghosts.
-- Preserves twelve individually randomized newer ghost designs, including the shy/peekaboo ghost at the same selection weight as the rest.
-- Balanced left/right spawn lanes, slow upward drift, occasional sideways motion, mild transparency, and automatic cleanup on leaving results.
-- Ghost voice selection supports the three OpenGameArt recordings: Ogrebane's Ghost (CC0), Berklee's Scary Ghost 1 (CC BY 3.0), and qubodup's Ghost Breath (CC0). The appropriate audio credits are provided in `FileCopies/GHOST_AUDIO_CREDITS.txt`.
-- An **optional personal** 5-sound testing variant additionally supports DRAGON-STUDIO Creepy Ghost Sound and Cemetery Wind. Those two Pixabay recordings are **not automatically bundled** in the GitHub CI release package.
+The Halloween results celebration now features twelve independently animated
+ghost designs and a randomized pool of five eerie sound effects.
 
-## Audio and artwork notices
-- The original Halloween menu music by Alex Morgan is CC BY 4.0, as explained in `THIRD_PARTY_NOTICES.md`.
-- The three OpenGameArt SFX are separately licensed. Keep the bundled credits file, including the Berklee CC BY 3.0 attribution.
-- The two Pixabay recordings require review for redistribution of extractable QMOD audio assets; they are omitted from automated public packages until cleared.
-- The separately sourced Uppbeat cinematic music sting is **not** bundled.
+## Gameplay
+- Celebration ghosts activate **only for ranks S, SS and SSS**.
+- Ranks A and lower have no custom ghost celebration.
+- Eight new embedded ghost illustrations plus four separately packaged
+  transparent sprites, including the shy/peekaboo design.
+- Every design has equal selection probability.
+- More balanced spawn positions, gentle upward drift, varied left/right
+  motion, softened opacity, and cleanup on leaving results.
+- Random ghost voices on approximately 42% of spawns.
 
-## Release readiness checklist
-- [x] Change results ghost threshold from rank A+ to S+.
-- [x] Update QPM and QMOD package metadata to v1.0.1.
-- [x] Compile and validate the 1.40.8 source through GitHub Actions.
-- [ ] Commit the four approved `ghost_extra_0.png` to `ghost_extra_3.png` sprites as 256x256 RGBA PNGs under `FileCopies/`.
-- [ ] Add their `fileCopies` entries to `mod.template.json` and assert their presence in the automated archive validation.
-- [ ] Verify the resulting public QMOD and source archive are complete and match the published v1.0.1 tag.
-- [ ] Merge the reviewed release branch and tag the final commit `v1.0.1` to activate the existing release workflow.
+## Five ghost voices
+- **Ghost** — Ogrebane, CC0.
+- **Scary Ghost 1** — Berklee College of Music, CC BY 3.0.
+- **Ghost Breath** — qubodup, CC0.
+- **Creepy Ghost Sound** — DRAGON-STUDIO, Pixabay Content License.
+- **Cemetery Wind** — DRAGON-STUDIO, Pixabay Content License; adapted to
+  a shorter ambient gust for the celebration.
 
-This branch is a **release candidate**, not an already-published GitHub release.
+All five are bundled into the functional QMOD. They are not distributed as a
+standalone audio pack. See the installed `GHOST_AUDIO_CREDITS.txt` and
+`PIXABAY_AUDIO_CREDITS.txt` as well as `THIRD_PARTY_NOTICES.md` for creator
+attributions, original sources, modifications, and applicable licenses.
+
+The optional Uppbeat one-time musical sting is **not** included in the public
+release.
+
+## Compatibility
+- Beat Saber **1.40.8_7379** for Quest 3 and compatible Quest headsets.
+- Install the `Halloween-Theme.qmod` using QuestPatcher.
+- For the corresponding source, use the `v1.0.1` tag or the matching
+  GitHub source ZIP, not a moving development branch.
+
+## Attribution and source
+This mod is derived from Christmas Theme code under GPLv3 with appropriate
+credits. Source: https://github.com/Abomination2169/Halloween-Theme
+
+Audio tracks retain their separately stated licenses. The project is free;
+third-party audio must not be extracted and republished standalone in
+violation of the respective terms.

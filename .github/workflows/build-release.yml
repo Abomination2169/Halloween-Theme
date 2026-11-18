@@ -7,6 +7,7 @@ on:
       - feature/ghost-results-1.40.8
       - feature/dedicated-ghost-controller-1.40.8
       - feature/original-artwork-ghost-controller-1.40.8
+      - feature/ghost-dispersion-original-sfx-1.40.8
     tags:
       - "v*"
   pull_request:
@@ -27,10 +28,17 @@ jobs:
 
       - name: Generate four transparent ghost sprites
         run: |
-          python3 -m pip install --break-system-packages cairosvg pillow
+          python3 -m pip install --break-system-packages cairosvg pillow numpy
           python3 scripts/render-ghost-sprites.py
           test -s assets/ghost_sprites.png
           for i in 0 1 2 3; do test -s "assets/ghost_single_$i.png"; done
+
+      - name: Generate three original royalty-free ghost voices
+        run: |
+          python3 scripts/generate_original_ghost_sfx.py
+          for name in ghost_original_woo ghost_original_eww ghost_original_oooo; do
+            test -s "FileCopies/$name.ogg"
+          done
 
       - name: Audit source configuration and package metadata
         run: python3 scripts/audit-source.py
@@ -38,7 +46,7 @@ jobs:
       - name: Install build tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build unzip curl python3
+          sudo apt-get install -y cmake ninja-build unzip curl python3 ffmpeg
 
       - name: Install QPM CLI
         env:
@@ -124,7 +132,7 @@ jobs:
               cover = manifest.get("coverImage")
               if cover and cover not in names:
                   raise SystemExit(f"QMOD is missing cover image: {cover}")
-              expected_audio = {"Ghostly_Horror_Menu.ogg", "ghost_moan_01.ogg", "ghost_moan_02.ogg", "ghost_breath.ogg"}
+              expected_audio = {"Ghostly_Horror_Menu.ogg", "ghost_original_woo.ogg", "ghost_original_eww.ogg", "ghost_original_oooo.ogg"}
               actual_audio = {Path(item["name"]).name for item in manifest.get("fileCopies", [])}
               if actual_audio != expected_audio:
                   raise SystemExit(f"Unexpected audio fileCopies: {sorted(actual_audio)}")

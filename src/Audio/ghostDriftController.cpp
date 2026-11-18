@@ -92,7 +92,7 @@ namespace {
     }
 
     void SpawnGhost(int sequence) {
-        if (!root || active.size() >= 5) return;
+        if (!root || active.size() >= 8) return;
 
         auto* go = GameObject::New_ctor("HalloweenIndependentGhost");
         auto* tr = go->get_transform().ptr();
@@ -104,15 +104,28 @@ namespace {
         }
 
         renderer->set_sprite(sprites[std::rand() % sprites.size()]);
+        // Higher transparent sorting priority can help against ordinary scene
+        // SpriteRenderers, but not necessarily screen-space UI canvases.
+        renderer->set_sortingOrder(100);
         // Spawn on either side at randomized positions, away from the central
         // rank and score panel. Do not alternate rigidly between sides.
         // Avoid placing a new ghost directly over a recently spawned one.
         float startX = 0.0f;
         float startY = 0.0f;
-        for (int attempt = 0; attempt < 12; ++attempt) {
-            const float side = Random01() < 0.5f ? -1.0f : 1.0f;
-            startX = side * Between(2.25f, 3.85f);
-            startY = Between(-1.65f, 0.35f);
+        float side = 1.0f;
+        bool foundClearSpawn = false;
+        // Include lower outer edges, mid-height, and upper corners; keep the
+        // central rank panel clear. Prefer clear positions over adding another
+        // ghost to an already crowded area.
+        for (int attempt = 0; attempt < 20; ++attempt) {
+            side = Random01() < 0.5f ? -1.0f : 1.0f;
+            const float lane = Random01();
+            const float radius = lane < 0.33f
+                ? Between(2.15f, 2.85f)
+                : lane < 0.70f ? Between(2.85f, 3.85f)
+                               : Between(3.85f, 4.75f);
+            startX = side * radius;
+            startY = Between(-1.45f, 1.30f);
             bool overlapping = false;
             for (const auto& earlier : active) {
                 if (earlier.age > 4.0f) continue;
@@ -122,17 +135,26 @@ namespace {
                 const float ey = earlier.startY + earlier.riseSpeed * earlier.age;
                 const float dx = startX - ex;
                 const float dy = startY - ey;
-                if (dx * dx + dy * dy < 1.0f * 1.0f) {
+                if (dx * dx + dy * dy < 0.95f * 0.95f) {
                     overlapping = true;
                     break;
                 }
             }
-            if (!overlapping) break;
+            if (!overlapping) {
+                foundClearSpawn = true;
+                break;
+            }
+        }
+        if (!foundClearSpawn) {
+            UnityEngine::Object::Destroy(go);
+            return;
         }
         // Independent constant drift can travel in either horizontal direction.
         // Sine-wave motion below adds subtle, non-linear floating on top.
-        const float driftX = (Random01() < 0.5f ? -1.0f : 1.0f)
-            * Between(0.05f, 0.16f);
+        // Bias roughly two-thirds of ghosts outward to reduce their path
+        // through the pumpkin/sign area, while retaining inward movement.
+        const float travelSide = Random01() < 0.68f ? side : -side;
+        const float driftX = travelSide * Between(0.045f, 0.15f);
         // The originals rendered like huge cut-outs at 1.15-1.65 scale.
         // Reduce to ~30% of their former apparent size.
         float scale = Between(0.36f, 0.49f);
@@ -199,7 +221,9 @@ namespace Halloween::ghostDrift {
         auto* camTr = camera->get_transform().ptr();
         const auto cam = camTr->get_position();
         const auto forward = camTr->get_forward();
-        constexpr float distance = 6.5f;
+        // Put ghosts slightly in front of the pumpkin-sign plane in camera
+        // space, reducing depth occlusion without changing the pumpkins.
+        constexpr float distance = 5.3f;
         object->get_transform()->set_position(Vector3(
             cam.x + forward.x * distance,
             cam.y + forward.y * distance,
@@ -235,7 +259,7 @@ void Halloween::GhostDriftController::Update() {
     // Stagger births, not simultaneous firework bursts.
     if (untilSpawn <= 0.0f) {
         SpawnGhost(sequence++);
-        untilSpawn = Between(0.85f, 1.55f);
+        untilSpawn = Between(0.60f, 1.10f);
     }
 
     for (std::size_t i = 0; i < active.size();) {

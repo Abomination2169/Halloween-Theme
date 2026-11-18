@@ -37,6 +37,7 @@ namespace {
         float lifetime;
         float startX;
         float startY;
+        float driftX;
         float riseSpeed;
         float awaySpeed;
         float wavePhase;
@@ -103,11 +104,31 @@ namespace {
         }
 
         renderer->set_sprite(sprites[std::rand() % sprites.size()]);
-        // Alternate sides so the score stays unobstructed. Each sprite
-        // is animated independently rather than moving as a firework burst.
-        float side = (sequence % 2 == 0) ? -1.0f : 1.0f;
-        float startX = side * Between(2.2f, 3.4f);
-        float startY = Between(-1.6f, -0.7f);
+        // Spawn on either side at randomized positions, away from the central
+        // rank and score panel. Do not alternate rigidly between sides.
+        // Avoid placing a new ghost directly over a recently spawned one.
+        float startX = 0.0f;
+        float startY = 0.0f;
+        for (int attempt = 0; attempt < 12; ++attempt) {
+            const float side = Random01() < 0.5f ? -1.0f : 1.0f;
+            startX = side * Between(2.25f, 3.85f);
+            startY = Between(-1.65f, 0.35f);
+            bool overlapping = false;
+            for (const auto& earlier : active) {
+                if (earlier.age > 2.0f) continue;
+                const float dx = startX - earlier.startX;
+                const float dy = startY - earlier.startY;
+                if (dx * dx + dy * dy < 1.35f * 1.35f) {
+                    overlapping = true;
+                    break;
+                }
+            }
+            if (!overlapping) break;
+        }
+        // Independent constant drift can travel in either horizontal direction.
+        // Sine-wave motion below adds subtle, non-linear floating on top.
+        const float driftX = (Random01() < 0.5f ? -1.0f : 1.0f)
+            * Between(0.05f, 0.16f);
         float scale = Between(1.15f, 1.65f);
         tr->set_localScale(Vector3(scale, scale, 1.0f));
         tr->set_localPosition(Vector3(startX, startY, 0.0f));
@@ -116,7 +137,7 @@ namespace {
 
         active.push_back({
             go, renderer, 0.0f,
-            Between(7.0f, 9.5f), startX, startY,
+            Between(7.0f, 9.5f), startX, startY, driftX,
             Between(0.30f, 0.46f), Between(0.16f, 0.28f),
             Between(0.0f, 6.28318f), Between(0.8f, 1.35f),
             Between(0.15f, 0.28f), scale
@@ -228,7 +249,7 @@ void Halloween::GhostDriftController::Update() {
                      * ghost.waveWidth;
         auto* tr = ghost.gameObject->get_transform().ptr();
         tr->set_localPosition(Vector3(
-            ghost.startX + sway,
+            ghost.startX + ghost.driftX * ghost.age + sway,
             ghost.startY + ghost.riseSpeed * ghost.age,
             ghost.awaySpeed * ghost.age
         ));

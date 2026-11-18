@@ -7,7 +7,7 @@ https://opengameart.org/sites/default/files/ghost.wav
 
 This script downloads the REAL recorded Ghost sound, rather than synthesizing
 cartoon voices. It produces three subtly different versions to vary ghost
-spawn playback. Source and license are documented in CC0-GHOST-SFX-SOURCES.md.
+spawn playback. Source and license are documented in ORIGINAL-GHOST-SFX-LICENSE.md.
 """
 from pathlib import Path
 import subprocess

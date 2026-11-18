@@ -19,5 +19,5 @@ namespace Halloween::ghostDrift {
     void SetResultsScreen(GlobalNamespace::ResultsViewController* results, bool eligible);
     void EndResultsScreen();
     bool IsEligible();
-    bool Begin(GlobalNamespace::FireworkItemController* firework);
+    bool Begin();
 }

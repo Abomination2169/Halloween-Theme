@@ -1,0 +1,30 @@
+Halloween Theme — Ghost Celebration SFX credits and licenses
+
+1. "Ghost" by Ogrebane
+   Source: https://opengameart.org/content/ghost
+   License: CC0 1.0 Universal
+   License text: https://creativecommons.org/publicdomain/zero/1.0/
+   Conversion: ghost.wav converted to OGG Vorbis, with volume adjusted to 80%.
+   File: ghost_ogrebane.ogg
+
+2. "Scary ghost 1" by The Berklee College of Music
+   Uploaded by qubodup
+   Source: https://opengameart.org/content/scary-ghost-1
+   License: Creative Commons Attribution 3.0 (CC BY 3.0)
+   License text: https://creativecommons.org/licenses/by/3.0/
+   Conversion: ghost_1.flac converted to OGG Vorbis, with volume adjusted to 80%.
+   File: ghost_scary_1.ogg
+
+3. "Ghost breath" by qubodup
+   Source: https://opengameart.org/content/ghost-breath
+   License: CC0 1.0 Universal
+   License text: https://creativecommons.org/publicdomain/zero/1.0/
+   Conversion: ghostbreath.flac converted to OGG Vorbis, with volume adjusted to 80%.
+   File: ghost_breath.ogg
+
+These credits are distributed with the QMOD and in its source repository.
+CC BY 3.0 requires appropriate credit, a license link, and identification of
+changes. The original recordings remain the work of their respective authors.
+
+The separate optional Uppbeat music sting is NOT included or cleared for
+redistribution by these licenses. Other assets have independent rights.

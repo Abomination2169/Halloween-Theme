@@ -1,0 +1,30 @@
+Halloween Theme v1.0.1 — DRAGON-STUDIO / Pixabay sound credits
+
+These recordings are incorporated into the free, interactive Halloween Theme
+Beat Saber Quest mod and are not offered as a separate sound effect pack.
+
+1. Creepy Ghost Sound by DRAGON-STUDIO
+   Source: https://pixabay.com/sound-effects/horror-creepy-ghost-sound-487677/
+   License: Pixabay Content License
+   License terms: https://pixabay.com/service/license-summary/
+   Original name: dragon-studio-creepy-ghost-sound-487677.mp3
+   Mod file: ghost_pixabay_creepy.ogg
+   Changes: converted to OGG Vorbis, adjusted volume and fade.
+
+2. Cemetery Wind by DRAGON-STUDIO
+   Source: https://pixabay.com/sound-effects/cemetery-wind-467488/
+   License: Pixabay Content License
+   License terms: https://pixabay.com/service/license-summary/
+   Original name: dragon-studio-cemetery-wind-467488.mp3
+   Mod file: ghost_pixabay_wind.ogg
+   Changes: converted to OGG Vorbis, trimmed for short results celebrations,
+            adjusted volume and faded out.
+
+The creator permits free commercial and personal use; redistribution of the
+standalone audio files is separately restricted by Pixabay. These assets are
+supplied as components of the functioning, free game mod rather than as an
+independent audio library. Do not extract and redistribute them separately.
+
+A licensing clarification was requested from Pixabay before the release.
+This notice is not a blanket grant of rights to republish the audio standalone.
+Additional OpenGameArt ghost audio credits are in GHOST_AUDIO_CREDITS.txt.

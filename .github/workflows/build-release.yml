@@ -1,9 +1,19 @@
-name: Build Halloween QMOD
+name: Build and release Halloween Theme QMOD
 
 on:
   push:
     branches:
       - main
+      - feature/ghost-results-1.40.8
+      - feature/dedicated-ghost-controller-1.40.8
+      - feature/original-artwork-ghost-controller-1.40.8
+      - feature/ghost-dispersion-original-sfx-1.40.8
+      - feature/ghost-art-variety-1.40.8
+      - feature/ghost-variety-final-four-1.40.8
+      - feature/new-ghosts-only-1.40.8
+      - feature/three-ghost-voices-1.40.8
+      - feature/five-ghost-sounds-personal-1.40.8
+      - release/v1.0.1-s-rank
     tags:
       - "v*"
   pull_request:
@@ -22,13 +32,34 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
+      - name: Generate four transparent ghost sprites
+        run: |
+          python3 -m pip install --break-system-packages cairosvg pillow numpy
+          python3 scripts/render-ghost-sprites.py
+          test -s assets/ghost_sprites.png
+          for i in 0 1 2 3; do test -s "assets/ghost_single_$i.png"; done
+          for i in 0 1 2 3 4 5 6 7; do test -s "assets/ghost_new_$i.png"; done
+
+      - name: Prepare runner build tools and FFmpeg
+        run: |
+          for executable in cmake ninja unzip curl python3; do
+            command -v "$executable" || { echo "Missing $executable on Ubuntu runner"; exit 1; }
+          done
+          python3 -m pip install --break-system-packages imageio-ffmpeg
+          mkdir -p "$RUNNER_TEMP/bin"
+          ln -s "$(python3 -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')" "$RUNNER_TEMP/bin/ffmpeg"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/bin/ffmpeg" -version
+
+      - name: Prepare three independently licensed OpenGameArt ghost recordings
+        run: |
+          python3 scripts/generate_original_ghost_sfx.py
+          for name in ghost_ogrebane ghost_scary_1 ghost_breath; do
+            test -s "FileCopies/$name.ogg"
+          done
+
       - name: Audit source configuration and package metadata
         run: python3 scripts/audit-source.py
-
-      - name: Install build tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build unzip curl python3
 
       - name: Install QPM CLI
         env:
@@ -61,6 +92,8 @@ jobs:
           manifest = json.loads(Path("mod.json").read_text(encoding="utf-8"))
           if manifest.get("id") != "halloween":
               raise SystemExit("Unexpected mod id")
+          if manifest.get("version") != "1.0.1":
+              raise SystemExit("Unexpected v1.0.1 package version")
           if manifest.get("packageVersion") != "1.40.8_7379":
               raise SystemExit("Manifest no longer targets Beat Saber 1.40.8_7379")
           if manifest.get("modFiles") != ["libhalloween.so"]:
@@ -107,6 +140,8 @@ jobs:
               manifest = json.loads(archive.read("mod.json"))
               if manifest.get("id") != "halloween":
                   raise SystemExit("Unexpected packaged mod id")
+              if manifest.get("version") != "1.0.1":
+                  raise SystemExit("Unexpected packaged version")
               if manifest.get("packageVersion") != "1.40.8_7379":
                   raise SystemExit("Packaged manifest no longer targets Beat Saber 1.40.8_7379")
               if "libhalloween.so" not in names:
@@ -114,13 +149,28 @@ jobs:
               cover = manifest.get("coverImage")
               if cover and cover not in names:
                   raise SystemExit(f"QMOD is missing cover image: {cover}")
-              expected_audio = {"Ghostly_Horror_Menu.ogg"}
-              actual_audio = {Path(item["name"]).name for item in manifest.get("fileCopies", [])}
-              if actual_audio != expected_audio:
-                  raise SystemExit(f"Unexpected audio fileCopies: {sorted(actual_audio)}")
-              if not expected_audio.issubset(names):
-                  raise SystemExit("QMOD is missing Ghostly_Horror_Menu.ogg")
-          print("QMOD validated: 1.40.8 manifest, library, cover, and menu audio.")
+              expected_files = {
+                  "Ghostly_Horror_Menu.ogg",
+                  "ghost_ogrebane.ogg", "ghost_scary_1.ogg", "ghost_breath.ogg",
+                  "ghost_pixabay_creepy.ogg", "ghost_pixabay_wind.ogg",
+                  "GHOST_AUDIO_CREDITS.txt", "PIXABAY_AUDIO_CREDITS.txt",
+                  "ghost_extra_0.png", "ghost_extra_1.png",
+                  "ghost_extra_2.png", "ghost_extra_3.png"
+              }
+              copied = {Path(item["name"]).name for item in manifest.get("fileCopies", [])}
+              if copied != expected_files:
+                  raise SystemExit(f"Unexpected fileCopies: {sorted(copied)}")
+              if not expected_files.issubset(names):
+                  raise SystemExit(f"Missing packaged assets: {sorted(expected_files - names)}")
+              for name in expected_files:
+                  data = archive.read(name)
+                  if len(data) < 100:
+                      raise SystemExit(f"Invalid asset: {name}")
+                  if name.endswith(".ogg") and not data.startswith(b"OggS"):
+                      raise SystemExit(f"Invalid OGG: {name}")
+                  if name.endswith(".png") and not data.startswith(b"\x89PNG\r\n\x1a\n"):
+                      raise SystemExit(f"Invalid PNG: {name}")
+          print("QMOD validated: v1.0.1, Beat Saber 1.40.8, 12 ghost designs, five sounds and credits.")
           PY
 
       - name: Upload build artifact
@@ -129,6 +179,80 @@ jobs:
           name: Halloween-QMOD
           path: Halloween-Theme.qmod
           if-no-files-found: error
+
+  publish_v101:
+    name: Publish v1.0.1 on main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify intended release and no previous published tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          qpm = json.loads(Path("qpm.json").read_text())
+          manifest = json.loads(Path("mod.template.json").read_text())
+          assert qpm["info"]["version"] == manifest["version"] == "1.0.1"
+          assert manifest["packageVersion"] == "1.40.8_7379"
+          PY
+          if gh release view v1.0.1 >/dev/null 2>&1; then
+            echo "Release v1.0.1 is already published; refusing to overwrite."
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v1.0.1"; then
+            echo "Tag v1.0.1 exists without a release; refusing to move it."
+            exit 1
+          fi
+
+      - name: Download exact QMOD artifact from this workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: Halloween-QMOD
+          path: dist
+
+      - name: Verify release package and source
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from zipfile import ZipFile
+          with ZipFile("dist/Halloween-Theme.qmod") as package:
+              assert package.testzip() is None
+              m = json.loads(package.read("mod.json"))
+              assert m["version"] == "1.0.1"
+              assert m["packageVersion"] == "1.40.8_7379"
+              assert len([p for p in package.namelist() if p.startswith("ghost_extra_") and p.endswith(".png")]) == 4
+              for name in ("ghost_ogrebane.ogg", "ghost_scary_1.ogg", "ghost_breath.ogg",
+                           "ghost_pixabay_creepy.ogg", "ghost_pixabay_wind.ogg",
+                           "GHOST_AUDIO_CREDITS.txt", "PIXABAY_AUDIO_CREDITS.txt"):
+                  assert name in package.namelist(), name
+          for name in [f"FileCopies/ghost_extra_{i}.png" for i in range(4)]:
+              assert Path(name).is_file()
+          PY
+          git archive --format=zip --prefix=Halloween-Theme/ HEAD -o dist/Halloween-Theme-GitHub-Source.zip
+          sha256sum dist/Halloween-Theme.qmod dist/Halloween-Theme-GitHub-Source.zip
+
+      - name: Publish verified GitHub Release v1.0.1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.0.1 \
+            dist/Halloween-Theme.qmod \
+            dist/Halloween-Theme-GitHub-Source.zip \
+            --target "$GITHUB_SHA" \
+            --title "Halloween Theme v1.0.1 for Beat Saber 1.40.8" \
+            --notes-file RELEASE_NOTES_v1.0.1.md \
+            --latest
 
   release:
     name: Publish tagged release

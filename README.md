@@ -15,6 +15,23 @@ Note: Development assisted with use of A.I. Please support talented artists and 
 
 **Compatible with:** Beat Saber 1.40.8 (Quest)
 
+### Halloween Theme v1.0.1 — Ghost celebration
+
+After completing a song with **rank S, SS or SSS**, twelve individually
+randomized ghosts drift upward around the results screen, paired with a
+five-sound randomized ghost-effect pool. Rank A or below does not trigger
+the celebration. All ghosts disappear upon leaving results.
+
+The v1.0.1 QMOD bundles the four additional transparent ghost PNGs and all
+five effects; installation requires only QuestPatcher. The shy/peekaboo ghost
+has the same selection weight as the other designs.
+
+Please see [v1.0.1 release notes](RELEASE_NOTES_v1.0.1.md) and
+[third-party notices](THIRD_PARTY_NOTICES.md) for credits and licensing.
+The two DRAGON-STUDIO effects are part of the interactive mod, not a
+standalone sound collection. Do not extract and redistribute them separately.
+
+
 ## License and source code
 
 See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for detailed attribution, audio licensing, and artwork provenance.

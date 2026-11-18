@@ -112,30 +112,54 @@ namespace {
         // Avoid placing a new ghost directly over a recently spawned one.
         float startX = 0.0f;
         float startY = 0.0f;
-        float side = 1.0f;
+        float side = -1.0f;
         bool foundClearSpawn = false;
-        // Include lower outer edges, mid-height, and upper corners; keep the
-        // central rank panel clear. Prefer clear positions over adding another
-        // ghost to an already crowded area.
-        for (int attempt = 0; attempt < 20; ++attempt) {
-            side = Random01() < 0.5f ? -1.0f : 1.0f;
+
+        // The previous fifty-fifty random choice could place several ghosts
+        // consecutively on the right. Balance the *current* side occupancy,
+        // with a gentle left preference whenever counts are equal.
+        int leftCount = 0;
+        int rightCount = 0;
+        for (const auto& earlier : active) {
+            const float currentX = earlier.startX + earlier.driftX * earlier.age;
+            if (currentX < 0.0f) ++leftCount;
+            else ++rightCount;
+        }
+        const float preferredSide = leftCount < rightCount ? -1.0f
+            : rightCount < leftCount ? 1.0f
+            : (Random01() < 0.65f ? -1.0f : 1.0f);
+
+        // Sample three horizontal lanes and different heights on both sides
+        // to get a dispersed cloud without covering the score/rank panel.
+        // Check both active positions and the positions they will reach shortly
+        // after this ghost appears, rather than just their birth positions.
+        for (int attempt = 0; attempt < 28; ++attempt) {
+            side = (attempt < 17 || Random01() < 0.70f)
+                ? preferredSide : -preferredSide;
             const float lane = Random01();
-            const float radius = lane < 0.33f
-                ? Between(2.15f, 2.85f)
-                : lane < 0.70f ? Between(2.85f, 3.85f)
-                               : Between(3.85f, 4.75f);
+            const float radius = lane < 0.30f ? Between(2.05f, 2.75f)
+                : lane < 0.72f ? Between(2.75f, 3.55f)
+                               : Between(3.55f, 4.45f);
             startX = side * radius;
-            startY = Between(-1.45f, 1.30f);
+            startY = Between(-1.55f, 1.30f);
             bool overlapping = false;
             for (const auto& earlier : active) {
-                if (earlier.age > 4.0f) continue;
-                const float ex = earlier.startX + earlier.driftX * earlier.age
+                const float nowX = earlier.startX + earlier.driftX * earlier.age
                     + std::sin(earlier.wavePhase + earlier.age * earlier.waveSpeed)
                       * earlier.waveWidth;
-                const float ey = earlier.startY + earlier.riseSpeed * earlier.age;
-                const float dx = startX - ex;
-                const float dy = startY - ey;
-                if (dx * dx + dy * dy < 0.95f * 0.95f) {
+                const float nowY = earlier.startY + earlier.riseSpeed * earlier.age;
+                const float dx = startX - nowX;
+                const float dy = startY - nowY;
+                if (dx * dx + dy * dy < 1.15f * 1.15f) {
+                    overlapping = true;
+                    break;
+                }
+                // Exclude forecast overlap during the first second as well.
+                const float futureX = nowX + earlier.driftX * 1.0f;
+                const float futureY = nowY + earlier.riseSpeed * 1.0f;
+                const float fx = startX - futureX;
+                const float fy = startY + 0.35f - futureY;
+                if (fx * fx + fy * fy < 1.0f * 1.0f) {
                     overlapping = true;
                     break;
                 }
@@ -147,7 +171,7 @@ namespace {
         }
         if (!foundClearSpawn) {
             UnityEngine::Object::Destroy(go);
-            return;
+            return; // Prefer skipping a ghost over overlapping five others.
         }
         // Independent constant drift can travel in either horizontal direction.
         // Sine-wave motion below adds subtle, non-linear floating on top.

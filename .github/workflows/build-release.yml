@@ -248,11 +248,9 @@ jobs:
           # User explicitly requested keeping v1.0.1. Move the existing
           # v1.0.1 tag to these corrected, tested sources, then replace both
           # published artifacts together. Never rename the manifest version.
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -f v1.0.1 "$GITHUB_SHA"
-          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" \
-            push origin +refs/tags/v1.0.1
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/v1.0.1" \
+            -f sha="$GITHUB_SHA" -F force=true \
+            --jq '.object.sha'
           gh release upload v1.0.1 \
             dist/Halloween-Theme.qmod \
             dist/Halloween-Theme-GitHub-Source.zip \

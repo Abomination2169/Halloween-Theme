@@ -14,6 +14,7 @@ on:
       - feature/three-ghost-voices-1.40.8
       - feature/five-ghost-sounds-personal-1.40.8
       - release/v1.0.1-s-rank
+      - fix/v1.0.1-ghost-sound-rotation-and-png-cleanup
     tags:
       - "v*"
   pull_request:

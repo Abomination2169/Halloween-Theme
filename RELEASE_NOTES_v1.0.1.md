@@ -30,6 +30,9 @@ attributions, original sources, modifications, and applicable licenses.
 The optional Uppbeat one-time musical sting is **not** included in the public
 release.
 
+## Menu floor fix
+- Prevents gameplay lighting from flashing on the menu floor when entering results or returning to song selection.
+
 ## Compatibility
 - Beat Saber **1.40.8_7379** for Quest 3 and compatible Quest headsets.
 - Install the `Halloween-Theme.qmod` using QuestPatcher.

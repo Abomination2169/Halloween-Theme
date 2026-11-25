@@ -1,6 +1,4 @@
-## 🎃 Halloween Theme — Video
-
-Watch Halloween Theme in action!
+## 🎃 Halloween Theme
 
 [![Halloween Theme - Beat Saber](Halloween-README.png)](https://www.youtube.com/watch?v=LgSdA3DGreM)
 
